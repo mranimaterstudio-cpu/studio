@@ -1,0 +1,79 @@
+'use server';
+/**
+ * @fileOverview A flow to generate a video explanation from a text prompt using Veo.
+ *
+ * - generateVideoExplanation - A function that handles generating the video.
+ */
+
+import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
+
+export async function generateVideoExplanation(
+  promptText: string
+): Promise<{ videoUrl: string | null }> {
+  try {
+    let { operation } = await ai.generate({
+      model: googleAI.model('veo-2.0-generate-001'),
+      prompt: `You are an AI-powered educational chatbot with integrated video generation capabilities. 
+               Generate a short, visually engaging video that explains the following concept: ${promptText}.
+               Include animations, diagrams, or simulations to illustrate key points.
+               Use a friendly and educational tone suitable for learners of all ages.
+               Provide step-by-step narration or subtitles to guide the viewer through the explanation.
+               Ensure the video is accessible, concise, and optimized for mobile and desktop viewing.`,
+      config: {
+        durationSeconds: 8,
+        aspectRatio: '16:9',
+      },
+    });
+
+    if (!operation) {
+      throw new Error('Expected the model to return an operation');
+    }
+
+    // Poll for completion
+    while (!operation.done) {
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // wait 5 seconds
+      operation = await ai.checkOperation(operation);
+    }
+
+    if (operation.error) {
+      throw new Error(
+        'Failed to generate video: ' + operation.error.message
+      );
+    }
+
+    const videoPart = operation.output?.message?.content.find(
+      (p) => !!p.media && p.media.contentType?.startsWith('video/')
+    );
+
+    if (!videoPart || !videoPart.media) {
+      console.error('No video found in operation result:', operation);
+      return { videoUrl: null };
+    }
+    
+    // The media URL from Veo is temporary and needs the API key for access.
+    // It's better to return it as a data URI if possible, but for simplicity, we pass it.
+    // In a real app, you'd download this server-side and serve it from your own storage.
+    // Here we'll assume the client can access it for a short time.
+    // A robust solution would convert this to a base64 data URI.
+    
+    // For now, let's just return the URL, but it might not be directly usable in the client
+    // without special handling (like a proxy that adds the API key).
+    // A quick fix is to return a data uri if we can get the buffer, but the SDK doesn't expose that directly.
+    // Let's create a mock data URI for demonstration purposes, as fetching requires node-fetch.
+    
+    // A better approach would be to return the media as a data URI.
+    const response = await fetch(`${videoPart.media.url}&key=${process.env.GEMINI_API_KEY}`);
+    if (!response.ok) {
+        throw new Error(`Failed to download video: ${response.statusText}`);
+    }
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+
+    return { videoUrl: `data:${videoPart.media.contentType};base64,${base64}` };
+
+  } catch (error) {
+    console.error('Error generating video explanation:', error);
+    throw error;
+  }
+}

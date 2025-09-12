@@ -102,7 +102,7 @@ export default function ChatPage() {
         <CardHeader className="border-b">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-2xl font-bold font-headline">Chatbot</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" suppressHydrationWarning>
               <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)}>
                 <SelectTrigger className="w-[180px] shadow-sm shadow-primary/20">
                   <SelectValue placeholder="Select Personality" />
@@ -165,7 +165,7 @@ export default function ChatPage() {
               <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => handleSendMessage(s)}>{s}</Badge>
             ))}
           </div>
-          <div className="w-full flex items-center gap-2">
+          <div className="w-full flex items-center gap-2" suppressHydrationWarning>
              <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12">
                 {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
               </Button>

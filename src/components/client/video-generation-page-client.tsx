@@ -110,11 +110,11 @@ export function VideoGenerationPageClient() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 flex-1">
+      <Card className="bg-card/50 flex-1 flex flex-col">
         <CardHeader>
           <CardTitle className="font-headline">Result</CardTitle>
         </CardHeader>
-        <CardContent className="h-full flex items-center justify-center">
+        <CardContent className="flex-1 flex items-center justify-center">
           {isGenerating ? (
             <div className="flex flex-col items-center gap-4 text-muted-foreground">
               <Loader2 className="w-16 h-16 animate-spin text-primary" />

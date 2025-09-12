@@ -4,22 +4,13 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Wand } from 'lucide-react';
+import { Loader2, Sparkles, Wand, Cuboid } from 'lucide-react';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
-import { generateVisualExplanation } from '@/ai/flows/generate-visual-explanation';
-import { z } from 'zod';
-
-const VisualExplanationSchema = z.object({
-  title: z.string(),
-  explanation: z.string(),
-  imagePrompt: z.string(),
-});
-
-type VisualExplanation = z.infer<typeof VisualExplanationSchema>;
+import { generateHybridVisualExplanation, HybridVisualExplanation } from '@/ai/flows/generate-hybrid-visual-explanation';
 
 export function VisualExplanationPageClient() {
   const [prompt, setPrompt] = useState('');
-  const [result, setResult] = useState<{explanation: VisualExplanation, imageUrl: string | null} | null>(null);
+  const [result, setResult] = useState<HybridVisualExplanation | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -36,16 +27,8 @@ export function VisualExplanationPageClient() {
     setResult(null);
 
     try {
-      const generationResult = await generateVisualExplanation(prompt);
-      if (generationResult.explanation && generationResult.imageUrl) {
-        setResult(generationResult);
-      } else {
-        toast({
-          title: 'Generation failed',
-          description: 'Could not generate a visual explanation. Please try again.',
-          variant: 'destructive',
-        });
-      }
+      const generationResult = await generateHybridVisualExplanation(prompt);
+      setResult(generationResult);
     } catch (error) {
       toast({
         title: 'Generation Failed',
@@ -69,7 +52,7 @@ export function VisualExplanationPageClient() {
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
-            <Wand /> Visual Explanation
+            <Wand /> Hybrid Explanation
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -83,13 +66,13 @@ export function VisualExplanationPageClient() {
                   id="prompt-input"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., How does photosynthesis work?"
+                  placeholder="e.g., How does a car engine work?"
                   disabled={isGenerating}
                   suppressHydrationWarning
                 />
               </PromptInputWrapper>
               <p className="text-xs text-muted-foreground">
-                Enter a concept and the AI will generate an explanation with a visual.
+                Enter a concept and the AI will find a 3D model or generate an image, along with an explanation.
               </p>
             </div>
             <div className="flex gap-2 pt-4">
@@ -123,7 +106,17 @@ export function VisualExplanationPageClient() {
             </div>
           ) : result ? (
              <div className="space-y-4 w-full max-w-2xl mx-auto">
-                {result.imageUrl && (
+                {result.modelUid ? (
+                   <div className="relative aspect-video w-full rounded-md overflow-hidden border">
+                        <iframe
+                            title="Sketchfab Viewer"
+                            src={`https://sketchfab.com/models/${result.modelUid}/embed?autospin=1&autostart=1`}
+                            allowFullScreen
+                            allow="autoplay; fullscreen; xr-spatial-tracking"
+                            className="w-full h-full"
+                        ></iframe>
+                    </div>
+                ) : result.imageUrl && (
                     <div className="relative aspect-video w-full rounded-md overflow-hidden border">
                         <Image src={result.imageUrl} alt={result.explanation.title} fill className="object-cover" />
                     </div>

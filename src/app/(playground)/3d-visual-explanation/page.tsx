@@ -41,13 +41,14 @@ export default function ThreeDVisualExplanationPage() {
 
   return (
     <div className="flex flex-col gap-8">
-        <form onSubmit={handlePromptSubmit} className="w-full">
+        <form onSubmit={handlePromptSubmit} className="w-full" suppressHydrationWarning>
             <PromptInputWrapper>
                 <PromptInput 
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Enter a concept to visualize in 3D..."
                     disabled={isGenerating}
+                    suppressHydrationWarning
                 />
                 <PromptInputActions>
                     <Button type="submit" size="icon" disabled={isGenerating || !prompt.trim()} className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30">

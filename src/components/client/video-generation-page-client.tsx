@@ -97,6 +97,7 @@ export function VisualExplanationPageClient() {
                 type="submit"
                 disabled={isGenerating || !prompt.trim()}
                 className="flex-1 shadow-md shadow-primary/30"
+                suppressHydrationWarning
               >
                 {isGenerating ? (
                   <Loader2 className="animate-spin" />

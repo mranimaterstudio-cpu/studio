@@ -70,7 +70,7 @@ export function ImageGenerationPageClient() {
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
-            <Wand /> Visual Explanation
+            <Wand /> Image Generation
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -84,13 +84,13 @@ export function ImageGenerationPageClient() {
                   id="prompt-input"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., How does photosynthesis work?"
+                  placeholder="e.g., A futuristic cityscape at sunset"
                   disabled={isGenerating}
                   suppressHydrationWarning
                 />
               </PromptInputWrapper>
               <p className="text-xs text-muted-foreground">
-                Enter a concept and the AI will generate an explanation with a visual.
+                Enter a concept and the AI will generate an image and explanation.
               </p>
             </div>
             <div className="flex gap-2 pt-4">
@@ -136,7 +136,7 @@ export function ImageGenerationPageClient() {
           ) : (
             <div className="text-center text-muted-foreground">
                 <Wand className="mx-auto h-12 w-12 mb-4" />
-                <p>Your generated visual and explanation will appear here.</p>
+                <p>Your generated image and explanation will appear here.</p>
             </div>
           )}
         </CardContent>

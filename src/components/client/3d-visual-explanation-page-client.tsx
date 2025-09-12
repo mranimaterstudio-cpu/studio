@@ -8,7 +8,7 @@ import {
   PromptInputWrapper,
   PromptInputActions,
 } from '@/components/ui/prompt-input';
-import {generateVisualExplanation} from '@/ai/flows/generate-visual-explanation';
+import { find3dModel } from '@/ai/flows/find-3d-model';
 
 export function ThreeDVisualExplanationPageClient() {
   const [prompt, setPrompt] = useState('');
@@ -29,7 +29,7 @@ export function ThreeDVisualExplanationPageClient() {
     setModelUid(null);
 
     try {
-      const result = await generateVisualExplanation(prompt);
+      const result = await find3dModel(prompt);
       if (result.modelUid) {
         setModelUid(result.modelUid);
       } else {

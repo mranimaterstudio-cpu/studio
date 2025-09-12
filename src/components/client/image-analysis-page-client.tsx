@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ScanSearch, Upload, X, Camera, CircleDot, Video, VideoOff } from 'lucide-react';
+import { Loader2, ScanSearch, Upload, X, Camera, CircleDot, VideoOff } from 'lucide-react';
 import { analyzeImage } from '@/ai/flows/analyze-image';
 import { Badge } from '@/components/ui/badge';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
@@ -93,7 +93,7 @@ export function ImageAnalysisPageClient() {
         commonName: result.identification.commonName,
         latinName: result.identification.latinName,
         isHealthy: result.diagnosis.isHealthy,
-        diagnosis: result.diagnosis,
+        diagnosis: result.diagnosis.diagnosis,
       });
     } catch (error) {
       console.error(error);
@@ -126,6 +126,7 @@ export function ImageAnalysisPageClient() {
             context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
             const dataUrl = canvas.toDataURL('image/png');
             setImageUrl(dataUrl);
+            setAnalysis(null);
         }
     }
   }
@@ -138,7 +139,7 @@ export function ImageAnalysisPageClient() {
             <ScanSearch />
             Image Analysis
           </CardTitle>
-          <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'upload' | 'webcam')}>
+          <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'upload' | 'webcam')} suppressHydrationWarning>
               <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="upload" suppressHydrationWarning><Upload className="mr-2 h-4 w-4"/> Upload</TabsTrigger>
                   <TabsTrigger value="webcam" suppressHydrationWarning><Camera className="mr-2 h-4 w-4"/> Webcam</TabsTrigger>

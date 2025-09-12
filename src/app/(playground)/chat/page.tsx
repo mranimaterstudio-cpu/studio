@@ -13,13 +13,7 @@ import { generateId } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { PromptInput, PromptInputWrapper, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input';
-
-const personalityPrompts: Record<Personality, string> = {
-  general: "You are a helpful general-purpose AI assistant.",
-  creative: "You are a creative muse, ready to inspire with imaginative ideas and stories.",
-  technical: "You are a technical expert, providing precise and detailed explanations on complex topics.",
-  sarcastic: "You are a sarcastic AI with a dry wit, but you're still helpful in your own way.",
-};
+import { chat } from '@/ai/flows/chat';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -38,23 +32,39 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
+    
     const userMessage: Message = { id: generateId(), role: 'user', content };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
-    // Mock AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: generateId(),
-        role: 'assistant',
-        content: `As a ${personality} AI, I'd say: "${content}" is an interesting thought.`,
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-      setIsLoading(false);
-    }, 1000);
+    try {
+        const response = await chat({
+            history: newMessages.map(({ id, ...rest }) => rest),
+            personality: personality,
+        });
+
+        const aiResponse: Message = {
+            id: generateId(),
+            role: 'assistant',
+            content: response.content,
+        };
+        setMessages((prev) => [...prev, aiResponse]);
+    } catch (error) {
+        console.error(error);
+        toast({
+            title: 'Error generating response',
+            description: 'The AI could not generate a response. Please check the console for details.',
+            variant: 'destructive',
+        });
+        // Optionally remove the user's message if the API call fails
+        setMessages(messages);
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleSaveExperiment = () => {
@@ -102,8 +112,8 @@ export default function ChatPage() {
         <CardHeader className="border-b">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-2xl font-bold font-headline">Chatbot</h2>
-            <div className="flex items-center gap-2" suppressHydrationWarning>
-              <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)}>
+            <div className="flex items-center gap-2" suppressHydrationWarning={true}>
+              <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)} suppressHydrationWarning>
                 <SelectTrigger className="w-[180px] shadow-sm shadow-primary/20" suppressHydrationWarning>
                   <SelectValue placeholder="Select Personality" />
                 </SelectTrigger>
@@ -114,7 +124,7 @@ export default function ChatPage() {
                   <SelectItem value="sarcastic">Sarcastic</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={handleSaveExperiment} variant="outline" className="shadow-sm shadow-primary/20" suppressHydrationWarning>
+              <Button onClick={handleSaveExperiment} variant="outline" className="shadow-sm shadow-primary/20" suppressHydrationWarning={true}>
                 <Save className="mr-2" /> Save
               </Button>
             </div>
@@ -165,8 +175,8 @@ export default function ChatPage() {
               <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => handleSendMessage(s)}>{s}</Badge>
             ))}
           </div>
-          <div className="w-full flex items-center gap-2" suppressHydrationWarning>
-             <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12" suppressHydrationWarning>
+          <div className="w-full flex items-center gap-2" suppressHydrationWarning={true}>
+             <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12" suppressHydrationWarning={true}>
                 {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
               </Button>
             <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(input); }} className="flex-1 flex gap-2">
@@ -179,8 +189,8 @@ export default function ChatPage() {
                     suppressHydrationWarning
                   />
                   <PromptInputActions>
-                    <PromptInputAction disabled={isLoading} suppressHydrationWarning><Mic/></PromptInputAction>
-                    <PromptInputAction disabled={isLoading} suppressHydrationWarning><Camera/></PromptInputAction>
+                    <PromptInputAction disabled={isLoading} suppressHydrationWarning={true}><Mic/></PromptInputAction>
+                    <PromptInputAction disabled={isLoading} suppressHydrationWarning={true}><Camera/></PromptInputAction>
                      <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30" suppressHydrationWarning>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                     </Button>

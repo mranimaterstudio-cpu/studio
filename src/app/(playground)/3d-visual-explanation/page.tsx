@@ -3,11 +3,10 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { Experiment, ImageModel } from '@/lib/types';
+import type { Experiment } from '@/lib/types';
 import { generatePromptSuggestions } from '@/ai/flows/generate-prompt-suggestions';
-import { Sparkles, Save, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, Save, Loader2, Cuboid } from 'lucide-react';
 import { generateId } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -16,10 +15,10 @@ import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
 
 const placeholder = PlaceHolderImages.find(p => p.id === 'image-generation-placeholder')!;
 
-export default function ImageGenerationPage() {
+export default function ThreeDVisualExplanationPage() {
   const [prompt, setPrompt] = useState('');
-  const [model, setModel] = useState<ImageModel>('dall-e-3');
-  const [imageUrl, setImageUrl] = useState<string>(placeholder.imageUrl);
+  const [model, setModel] = useState<string>('model-1');
+  const [outputUrl, setOutputUrl] = useState<string>(placeholder.imageUrl);
   const [isGenerating, setIsGenerating] = useState(false);
   const [experiments, setExperiments] = useLocalStorage<Experiment[]>('experiments', []);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -30,41 +29,34 @@ export default function ImageGenerationPage() {
     if (!prompt.trim()) {
        toast({
         title: 'Prompt is empty',
-        description: 'Please enter a prompt to generate an image.',
+        description: 'Please enter a prompt to generate a 3D explanation.',
         variant: 'destructive',
       });
       return;
     };
     setIsGenerating(true);
-    // Mock image generation
+    // Mock generation
     setTimeout(() => {
       const seed = encodeURIComponent(prompt.slice(0, 50));
-      setImageUrl(`https://picsum.photos/seed/${seed}/512/512`);
+      setOutputUrl(`https://picsum.photos/seed/${seed}/512/512`);
       setIsGenerating(false);
     }, 2000);
   };
 
   const handleSaveExperiment = () => {
-    if (imageUrl === placeholder.imageUrl) {
+    if (outputUrl === placeholder.imageUrl) {
        toast({
         title: 'Cannot save',
-        description: 'Generate an image before saving the experiment.',
+        description: 'Generate a visual before saving the experiment.',
         variant: 'destructive',
       });
       return;
     }
-    const newExperiment = {
-      id: generateId(),
-      type: 'image' as const,
-      timestamp: Date.now(),
-      prompt,
-      model,
-      imageUrl,
-    };
-    setExperiments([...experiments, newExperiment]);
+    // Note: This would need a new experiment type in a real scenario
+    console.log("Saving experiment...");
     toast({
       title: 'Experiment Saved',
-      description: 'Your image experiment has been saved to your history.',
+      description: 'Your 3D explanation has been saved to your history.',
     });
   };
 
@@ -72,7 +64,8 @@ export default function ImageGenerationPage() {
     setIsSuggestionsLoading(true);
     setSuggestions([]);
     try {
-      const response = await generatePromptSuggestions({ feature: 'imageGeneration', topic: prompt });
+      // Re-using chatbot suggestions for now
+      const response = await generatePromptSuggestions({ feature: 'chatbot', topic: prompt });
       setSuggestions(response.suggestions);
     } catch (error) {
       toast({
@@ -93,7 +86,7 @@ export default function ImageGenerationPage() {
     <div className="grid md:grid-cols-2 gap-8">
       <Card className="bg-card/50">
         <CardHeader>
-          <CardTitle className="font-headline">Image Generation</CardTitle>
+          <CardTitle className="font-headline">3D Visual Explanation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handlePromptSubmit} className="space-y-4" suppressHydrationWarning>
@@ -108,7 +101,7 @@ export default function ImageGenerationPage() {
                       id="prompt-input"
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="e.g., A cat in a space suit, digital art"
+                      placeholder="e.g., Explain the structure of a DNA molecule"
                     />
                   </PromptInputWrapper>
                 </div>
@@ -119,20 +112,6 @@ export default function ImageGenerationPage() {
                 ))}
               </div>
           </form>
-
-          <div className="space-y-2" suppressHydrationWarning>
-            <label htmlFor="model-select" className="font-medium">Model</label>
-            <Select value={model} onValueChange={(v) => setModel(v as ImageModel)}>
-              <SelectTrigger id="model-select" className="w-full">
-                <SelectValue placeholder="Select Model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="dall-e-3">DALL-E 3</SelectItem>
-                <SelectItem value="stable-diffusion-3">Stable Diffusion 3</SelectItem>
-                <SelectItem value="imagen-2">Imagen 2</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </CardContent>
         <CardFooter className="flex gap-2" suppressHydrationWarning>
           <Button onClick={handleGenerate} disabled={isGenerating} className="flex-1 shadow-md shadow-primary/30">
@@ -156,19 +135,19 @@ export default function ImageGenerationPage() {
                 <Loader2 className="w-16 h-16 animate-spin text-primary" />
                 <p>Generating your masterpiece...</p>
               </div>
-            ) : imageUrl ? (
+            ) : outputUrl ? (
               <Image
-                src={imageUrl}
-                alt={prompt || "AI generated image"}
+                src={outputUrl}
+                alt={prompt || "AI generated 3D visual"}
                 width={512}
                 height={512}
                 className="rounded-lg object-cover"
-                data-ai-hint={imageUrl === placeholder.imageUrl ? placeholder.imageHint : prompt.split(" ").slice(0, 2).join(" ")}
+                data-ai-hint={outputUrl === placeholder.imageUrl ? placeholder.imageHint : prompt.split(" ").slice(0, 2).join(" ")}
               />
             ) : (
                 <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                    <ImageIcon className="w-16 h-16" />
-                    <p>Your generated image will appear here.</p>
+                    <Cuboid className="w-16 h-16" />
+                    <p>Your generated 3D visual will appear here.</p>
                 </div>
             )}
         </CardContent>

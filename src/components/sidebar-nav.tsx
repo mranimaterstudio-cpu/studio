@@ -6,12 +6,12 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Cuboid, History, ScanSearch, Video } from 'lucide-react';
+import { MessageSquare, Cuboid, History, ScanSearch, Wand } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [
   { href: '/chat', label: 'Chatbot', icon: MessageSquare },
-  { href: '/video-generation', label: 'Video Generation', icon: Video },
+  { href: '/video-generation', label: 'Visual Explanation', icon: Wand },
   { href: '/3d-visual-explanation', label: '3D Visual Explanation', icon: Cuboid },
   { href: '/image-analysis', label: 'Image Analysis', icon: ScanSearch },
   { href: '/history', label: 'History', icon: History },

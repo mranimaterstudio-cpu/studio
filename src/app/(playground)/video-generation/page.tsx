@@ -1,15 +1,26 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Video } from 'lucide-react';
+import { Loader2, Sparkles, Wand } from 'lucide-react';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
 import { generateVideoExplanation } from '@/ai/flows/generate-video-explanation';
+import { z } from 'zod';
+
+const VisualExplanationSchema = z.object({
+  title: z.string(),
+  explanation: z.string(),
+  imagePrompt: z.string(),
+});
+
+type VisualExplanation = z.infer<typeof VisualExplanationSchema>;
+
 
 export default function VideoGenerationPage() {
   const [prompt, setPrompt] = useState('');
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [result, setResult] = useState<{explanation: VisualExplanation, imageUrl: string | null} | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -17,22 +28,22 @@ export default function VideoGenerationPage() {
     if (!prompt.trim()) {
       toast({
         title: 'Prompt is empty',
-        description: 'Please enter a prompt to generate a video.',
+        description: 'Please enter a prompt to generate an explanation.',
         variant: 'destructive',
       });
       return;
     }
     setIsGenerating(true);
-    setVideoUrl(null);
+    setResult(null);
 
     try {
-      const result = await generateVideoExplanation(prompt);
-      if (result.videoUrl) {
-        setVideoUrl(result.videoUrl);
+      const generationResult = await generateVideoExplanation(prompt);
+      if (generationResult.explanation && generationResult.imageUrl) {
+        setResult(generationResult);
       } else {
         toast({
-          title: 'Video generation failed',
-          description: 'Could not generate a video. Please try again.',
+          title: 'Generation failed',
+          description: 'Could not generate a visual explanation. Please try again.',
           variant: 'destructive',
         });
       }
@@ -40,7 +51,7 @@ export default function VideoGenerationPage() {
       toast({
         title: 'Generation Failed',
         description:
-          'An error occurred during video generation. Please check the console for details.',
+          'An error occurred during generation. Please check the console for details.',
         variant: 'destructive',
       });
       console.error(error);
@@ -59,7 +70,7 @@ export default function VideoGenerationPage() {
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
-            <Video /> Video Generation
+            <Wand /> Visual Explanation
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -73,7 +84,7 @@ export default function VideoGenerationPage() {
                   id="prompt-input"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., Explain Newton's Second Law of Motion"
+                  placeholder="e.g., Explain how a black hole is formed"
                   disabled={isGenerating}
                 />
               </PromptInputWrapper>
@@ -100,22 +111,28 @@ export default function VideoGenerationPage() {
         <CardHeader>
           <CardTitle className="font-headline">Result</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center aspect-video relative">
+        <CardContent className="flex flex-col items-center justify-center gap-4">
           {isGenerating ? (
-            <div className="flex flex-col items-center gap-4 text-muted-foreground">
+            <div className="flex flex-col items-center gap-4 text-muted-foreground pt-16">
               <Loader2 className="w-16 h-16 animate-spin text-primary" />
-              <p>Generating video... This may take a minute.</p>
+              <p>Generating your explanation...</p>
             </div>
-          ) : videoUrl ? (
-            <video
-              src={videoUrl}
-              controls
-              className="w-full h-full rounded-md"
-            />
+          ) : result ? (
+            <div className="space-y-4 w-full">
+                <div className="relative aspect-video w-full rounded-md overflow-hidden border">
+                    {result.imageUrl && (
+                        <Image src={result.imageUrl} alt={result.explanation.title} fill className="object-cover" />
+                    )}
+                </div>
+                <div className='space-y-2'>
+                    <h3 className="text-xl font-bold">{result.explanation.title}</h3>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{result.explanation.explanation}</p>
+                </div>
+            </div>
           ) : (
-            <div className="text-center text-muted-foreground">
-                <Video className="mx-auto h-12 w-12 mb-4" />
-                <p>Your generated video will appear here.</p>
+            <div className="text-center text-muted-foreground pt-16">
+                <Wand className="mx-auto h-12 w-12 mb-4" />
+                <p>Your generated explanation will appear here.</p>
             </div>
           )}
         </CardContent>

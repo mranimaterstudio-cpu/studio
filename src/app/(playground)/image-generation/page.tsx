@@ -96,7 +96,7 @@ export default function ImageGenerationPage() {
           <CardTitle className="font-headline">Image Generation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <form onSubmit={handlePromptSubmit} className="space-y-4">
+          <form onSubmit={handlePromptSubmit} className="space-y-4" suppressHydrationWarning>
              <div className="space-y-2">
                 <label htmlFor="prompt-input" className="font-medium">Prompt</label>
                  <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export default function ImageGenerationPage() {
               </div>
           </form>
 
-          <div className="space-y-2">
+          <div className="space-y-2" suppressHydrationWarning>
             <label htmlFor="model-select" className="font-medium">Model</label>
             <Select value={model} onValueChange={(v) => setModel(v as ImageModel)}>
               <SelectTrigger id="model-select" className="w-full">
@@ -134,7 +134,7 @@ export default function ImageGenerationPage() {
             </Select>
           </div>
         </CardContent>
-        <CardFooter className="flex gap-2">
+        <CardFooter className="flex gap-2" suppressHydrationWarning>
           <Button onClick={handleGenerate} disabled={isGenerating} className="flex-1 shadow-md shadow-primary/30">
             {isGenerating ? <Loader2 className="mr-2 animate-spin" /> : null}
             Generate

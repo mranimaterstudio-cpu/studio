@@ -1,6 +1,5 @@
 'use client';
 import {useState} from 'react';
-import {Card, CardContent} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {useToast} from '@/hooks/use-toast';
 import {Loader2, Cuboid} from 'lucide-react';
@@ -60,82 +59,53 @@ export default function ThreeDVisualExplanationPage() {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-8">
-      <div className="flex flex-col justify-between h-full">
-        <div className="flex items-center justify-center aspect-video relative">
-          {isGenerating ? (
-            <div className="flex flex-col items-center gap-4 text-muted-foreground">
-              <Loader2 className="w-16 h-16 animate-spin text-primary" />
-              <p>Searching for 3D model...</p>
-            </div>
-          ) : modelUid ? (
-            <iframe
-              title="Sketchfab Viewer"
-              src={`https://sketchfab.com/models/${modelUid}/embed?autospin=1&autostart=1`}
-              allowFullScreen
-              allow="autoplay; fullscreen; xr-spatial-tracking"
-              className="w-full h-full rounded-md border-0"
-            ></iframe>
-          ) : (
-            <div className="text-center text-muted-foreground">
-              <Cuboid className="mx-auto h-12 w-12 mb-4" />
-              <p>Enter a prompt to search for a 3D model on Sketchfab.</p>
-            </div>
-          )}
-        </div>
-        <form
-          onSubmit={handlePromptSubmit}
-          className="w-full mt-4"
-          suppressHydrationWarning
-        >
-          <PromptInputWrapper>
-            <PromptInput
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              placeholder="Enter a concept to visualize..."
-              disabled={isGenerating}
-              suppressHydrationWarning
-            />
-            <PromptInputActions>
-              <Button
-                type="submit"
-                size="icon"
-                disabled={isGenerating || !prompt.trim()}
-                className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30"
-              >
-                {isGenerating ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <Cuboid />
-                )}
-              </Button>
-            </PromptInputActions>
-          </PromptInputWrapper>
-        </form>
+    <div className="flex flex-col h-full gap-4">
+      <div className="flex-1 flex items-center justify-center relative">
+        {isGenerating ? (
+          <div className="flex flex-col items-center gap-4 text-muted-foreground">
+            <Loader2 className="w-16 h-16 animate-spin text-primary" />
+            <p>Searching for 3D model...</p>
+          </div>
+        ) : modelUid ? (
+          <iframe
+            title="Sketchfab Viewer"
+            src={`https://sketchfab.com/models/${modelUid}/embed?autospin=1&autostart=1`}
+            allowFullScreen
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            className="w-full h-full rounded-md border"
+          ></iframe>
+        ) : (
+          <div className="text-center text-muted-foreground">
+            <Cuboid className="mx-auto h-12 w-12 mb-4" />
+            <p>Enter a prompt to search for a 3D model on Sketchfab.</p>
+          </div>
+        )}
       </div>
-      <Card>
-        <CardContent className="flex items-center justify-center aspect-video relative">
-          {isGenerating ? (
-            <div className="flex flex-col items-center gap-4 text-muted-foreground">
-              <Loader2 className="w-16 h-16 animate-spin text-primary" />
-              <p>Searching for 3D model...</p>
-            </div>
-          ) : modelUid ? (
-            <iframe
-              title="Sketchfab Viewer"
-              src={`https://sketchfab.com/models/${modelUid}/embed?autospin=1&autostart=1`}
-              allowFullScreen
-              allow="autoplay; fullscreen; xr-spatial-tracking"
-              className="w-full h-full rounded-md border-0"
-            ></iframe>
-          ) : (
-            <div className="text-center text-muted-foreground">
-              <Cuboid className="mx-auto h-12 w-12 mb-4" />
-              <p>Enter a prompt to search for a 3D model on Sketchfab.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <form onSubmit={handlePromptSubmit} className="w-full max-w-2xl mx-auto">
+        <PromptInputWrapper>
+          <PromptInput
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="Enter a concept to visualize..."
+            disabled={isGenerating}
+            suppressHydrationWarning
+          />
+          <PromptInputActions>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isGenerating || !prompt.trim()}
+              className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30"
+            >
+              {isGenerating ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Cuboid />
+              )}
+            </Button>
+          </PromptInputActions>
+        </PromptInputWrapper>
+      </form>
     </div>
   );
 }

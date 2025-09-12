@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -23,10 +24,13 @@ Provide step-by-step explanations when necessary (especially useful for formulas
     if (imageUrl) {
         const match = imageUrl.match(/^data:(image\/[a-zA-Z]+);base64,/);
         if (!match) {
-            throw new Error('Invalid image data URI');
+            // Do not throw an error, just proceed without the image if the URI is invalid.
+            // This can happen if a previous image state is not cleared properly.
+            console.warn('Invalid image data URI provided. Proceeding without image.');
+        } else {
+            const contentType = match[1];
+            promptParts.unshift({media: {url: imageUrl, contentType }});
         }
-        const contentType = match[1];
-        promptParts.unshift({media: {url: imageUrl, contentType }});
     }
 
     const response = await ai.generate({

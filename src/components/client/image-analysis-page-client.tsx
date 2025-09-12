@@ -141,8 +141,8 @@ export function ImageAnalysisPageClient() {
             </div>
             <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'upload' | 'webcam')}>
                 <TabsList>
-                    <TabsTrigger value="upload"><Upload className="mr-2 h-4 w-4"/> Upload</TabsTrigger>
-                    <TabsTrigger value="webcam"><Camera className="mr-2 h-4 w-4"/> Webcam</TabsTrigger>
+                    <TabsTrigger value="upload" suppressHydrationWarning><Upload className="mr-2 h-4 w-4"/> Upload</TabsTrigger>
+                    <TabsTrigger value="webcam" suppressHydrationWarning><Camera className="mr-2 h-4 w-4"/> Webcam</TabsTrigger>
                 </TabsList>
             </Tabs>
           </CardTitle>
@@ -153,12 +153,12 @@ export function ImageAnalysisPageClient() {
                     {imageUrl ? (
                         <>
                             <Image src={imageUrl} alt="Uploaded for analysis" layout="fill" className="rounded-md object-contain" />
-                            <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={handleRemoveImage}>
+                            <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={handleRemoveImage} suppressHydrationWarning>
                               <X/>
                             </Button>
                         </>
                     ) : inputMode === 'upload' ? (
-                       <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="h-auto p-8 flex flex-col gap-2">
+                       <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="h-auto p-8 flex flex-col gap-2" suppressHydrationWarning>
                            <Upload className="h-12 w-12" />
                            <span className="font-semibold">Choose File</span>
                        </Button>
@@ -177,7 +177,7 @@ export function ImageAnalysisPageClient() {
                             {hasCameraPermission && (
                                 <>
                                     <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-                                    <Button onClick={handleCapture} className="absolute bottom-4 z-10 shadow-lg shadow-primary/40 rounded-full" size="lg">
+                                    <Button onClick={handleCapture} className="absolute bottom-4 z-10 shadow-lg shadow-primary/40 rounded-full" size="lg" suppressHydrationWarning>
                                         <CircleDot className="mr-2"/> Capture
                                     </Button>
                                 </>
@@ -207,7 +207,7 @@ export function ImageAnalysisPageClient() {
              </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAnalyze} disabled={isAnalyzing || !imageUrl} className="w-full">
+          <Button onClick={handleAnalyze} disabled={isAnalyzing || !imageUrl} className="w-full" suppressHydrationWarning>
             {isAnalyzing ? <Loader2 className="mr-2 animate-spin" /> : <ScanSearch className="mr-2" />}
             Analyze Image
           </Button>
@@ -250,5 +250,3 @@ export function ImageAnalysisPageClient() {
     </div>
   );
 }
-
-    

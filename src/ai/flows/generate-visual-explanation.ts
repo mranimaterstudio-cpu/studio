@@ -1,89 +1,60 @@
 'use server';
 /**
- * @fileOverview A flow to generate a visual explanation video from a text prompt.
+ * @fileOverview A flow to find a 3D model from Sketchfab.
  *
- * - generateVisualExplanation - A function that handles the video generation process.
+ * - generateVisualExplanation - A function that handles finding a 3D model.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
-import {Readable} from 'stream';
+import {z} from 'zod';
+
+const SketchfabSearchResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      uid: z.string(),
+    })
+  ),
+});
 
 export async function generateVisualExplanation(
   promptText: string
-): Promise<{videoUrl: string | null}> {
-  return generateVisualExplanationFlow(promptText);
+): Promise<{modelUid: string | null}> {
+  if (!process.env.SKETCHFAB_API_KEY) {
+    throw new Error('Sketchfab API key is not configured.');
+  }
+
+  const searchParams = new URLSearchParams({
+    type: 'models',
+    q: promptText,
+    downloadable: 'true',
+  });
+
+  try {
+    const response = await fetch(
+      `https://api.sketchfab.com/v3/search?${searchParams.toString()}`,
+      {
+        headers: {
+          Authorization: `Token ${process.env.SKETCHFAB_API_KEY}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Sketchfab API error:', await response.text());
+      throw new Error(`Sketchfab API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const validatedData = SketchfabSearchResponseSchema.safeParse(data);
+
+    if (!validatedData.success) {
+      console.error('Invalid data from Sketchfab API:', validatedData.error);
+      return {modelUid: null};
+    }
+
+    const firstResult = validatedData.data.results[0];
+    return {modelUid: firstResult ? firstResult.uid : null};
+  } catch (error) {
+    console.error('Error fetching from Sketchfab:', error);
+    throw error;
+  }
 }
-
-async function convertVideoToBase64(videoUrl: string): Promise<string> {
-  const fetch = (await import('node-fetch')).default;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not set');
-  }
-
-  const response = await fetch(`${videoUrl}&key=${apiKey}`);
-  if (!response.ok || !response.body) {
-    throw new Error(`Failed to download video: ${response.statusText}`);
-  }
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of response.body) {
-    chunks.push(chunk as Buffer);
-  }
-  const videoBuffer = Buffer.concat(chunks);
-  return `data:video/mp4;base64,${videoBuffer.toString('base64')}`;
-}
-
-const generateVisualExplanationFlow = ai.defineFlow(
-  {
-    name: 'generateVisualExplanationFlow',
-    inputSchema: z.string(),
-    outputSchema: z.object({videoUrl: z.string().nullable()}),
-  },
-  async prompt => {
-    // NOTE: The Veo model requires a Google Cloud project with billing enabled.
-    // To avoid errors, we are returning a mocked response.
-    // To use the actual video generation, enable billing on your project
-    // and uncomment the code below.
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    return { videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' };
-
-    /*
-    let {operation} = await ai.generate({
-      model: googleAI.model('veo-2.0-generate-001'),
-      prompt: `Create a short, clear, and concise visual explanation of the following concept: ${prompt}`,
-      config: {
-        durationSeconds: 5,
-        aspectRatio: '16:9',
-      },
-    });
-
-    if (!operation) {
-      throw new Error('Expected the model to return an operation');
-    }
-
-    // Poll for completion
-    while (!operation.done) {
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      operation = await ai.checkOperation(operation);
-    }
-
-    if (operation.error) {
-      throw new Error(
-        `Failed to generate video: ${operation.error.code} ${operation.error.message}`
-      );
-    }
-
-    const video = operation.output?.message?.content.find(p => !!p.media);
-    if (!video || !video.media?.url) {
-      return {videoUrl: null};
-    }
-
-    const dataUri = await convertVideoToBase64(video.media.url);
-    return {videoUrl: dataUri};
-    */
-  }
-);

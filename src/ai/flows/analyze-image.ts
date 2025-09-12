@@ -62,45 +62,7 @@ const analyzeImageFlow = ai.defineFlow(
     outputSchema: AnalyzeImageOutputSchema,
   },
   async input => {
-    // For this example, we'll mock the response to avoid needing a powerful model.
-    // In a real scenario, you would call the prompt like this:
-    // const {output} = await prompt(input);
-    // return output!;
-
-    // Mock Response
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    if (input.photoDataUri.includes('error')) {
-      throw new Error("Mock error triggered for image analysis.");
-    }
-    
-    const isPlant = !input.description.toLowerCase().includes('not a plant');
-    
-    if (isPlant) {
-        const isHealthy = !input.description.toLowerCase().includes('unhealthy');
-        return {
-            identification: {
-                isPlant: true,
-                commonName: "Monstera Deliciosa",
-                latinName: "Monstera deliciosa",
-            },
-            diagnosis: {
-                isHealthy: isHealthy,
-                diagnosis: isHealthy ? "The plant appears to be in good health. Keep up the great work!" : "The leaves show signs of yellowing, which could indicate overwatering. Check the soil moisture and adjust your watering schedule.",
-            },
-        };
-    } else {
-        return {
-            identification: {
-                isPlant: false,
-                commonName: "A Cute Cat",
-                latinName: "",
-            },
-            diagnosis: {
-                isHealthy: true,
-                diagnosis: "This is a picture of a cat, not a plant. It looks quite happy!",
-            },
-        };
-    }
+    const {output} = await prompt(input);
+    return output!;
   }
 );

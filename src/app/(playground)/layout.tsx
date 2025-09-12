@@ -19,7 +19,7 @@ export default function PlaygroundLayout({
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <Link href="/chat" className="flex items-center gap-2">
+          <Link href="/ai-assistant" className="flex items-center gap-2">
             <Bot className="w-8 h-8 text-primary" />
             <h1 className="text-2xl font-semibold font-headline text-primary">AI Playground</h1>
           </Link>
@@ -31,7 +31,7 @@ export default function PlaygroundLayout({
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-md sm:hidden">
           <SidebarTrigger suppressHydrationWarning />
-          <Link href="/chat" className="flex items-center gap-2">
+          <Link href="/ai-assistant" className="flex items-center gap-2">
             <Bot className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-semibold font-headline text-primary">AI Playground</h1>
           </Link>

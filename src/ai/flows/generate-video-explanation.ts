@@ -8,6 +8,7 @@
 import { ai } from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const VisualExplanationSchema = z.object({
   title: z.string().describe('A clear and concise title for the explanation.'),
@@ -42,9 +43,10 @@ export async function generateVideoExplanation(
     }
     
     // Step 2: Return a placeholder image to avoid billing errors with Imagen.
-    // We use the user's prompt as a seed to get a different image for different prompts.
+    // We use a specific placeholder for generated content.
     await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-    const imageUrl = `https://picsum.photos/seed/${encodeURIComponent(promptText)}/512/512`;
+    const placeholder = PlaceHolderImages.find(p => p.id === 'image-generation-placeholder');
+    const imageUrl = placeholder ? placeholder.imageUrl : 'https://picsum.photos/seed/placeholder/512/512';
 
 
     return { 

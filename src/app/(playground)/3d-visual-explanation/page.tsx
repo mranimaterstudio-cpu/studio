@@ -5,15 +5,16 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Cuboid } from 'lucide-react';
 import { PromptInput, PromptInputWrapper, PromptInputActions } from '@/components/ui/prompt-input';
+import { generateVisualExplanation } from '@/ai/flows/generate-visual-explanation';
 
 export default function ThreeDVisualExplanationPage() {
   const [prompt, setPrompt] = useState('');
-  const [outputUrl, setOutputUrl] = useState<string>('https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+  const [outputUrl, setOutputUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [videoKey, setVideoKey] = useState(Date.now());
   const { toast } = useToast();
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!prompt.trim()) {
        toast({
         title: 'Prompt is empty',
@@ -23,14 +24,26 @@ export default function ThreeDVisualExplanationPage() {
       return;
     };
     setIsGenerating(true);
-    // Mock generation
-    setTimeout(() => {
-      // In a real app, you'd generate a video and get a new URL.
-      // For this mock, we'll just re-use a placeholder and update the key to force re-render.
-      setOutputUrl('https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-      setVideoKey(Date.now()); // Force the video element to re-load
-      setIsGenerating(false);
-    }, 2000);
+    setOutputUrl(null);
+    
+    try {
+      const result = await generateVisualExplanation(prompt);
+      if (result.videoUrl) {
+        setOutputUrl(result.videoUrl);
+        setVideoKey(Date.now()); // Force the video element to re-load
+      } else {
+        throw new Error("Video generation failed to produce a URL.");
+      }
+    } catch (error) {
+       toast({
+        title: 'Generation Failed',
+        description: 'Could not generate the visual explanation. Please try again.',
+        variant: 'destructive',
+      });
+      console.error(error);
+    }
+
+    setIsGenerating(false);
   };
   
   const handlePromptSubmit = (e: React.FormEvent) => {
@@ -65,9 +78,9 @@ export default function ThreeDVisualExplanationPage() {
                 {isGenerating ? (
                     <div className="flex flex-col items-center gap-4 text-muted-foreground">
                         <Loader2 className="w-16 h-16 animate-spin text-primary" />
-                        <p>Generating 3D visualization...</p>
+                        <p>Generating 3D visualization... (this may take a minute)</p>
                     </div>
-                ) : (
+                ) : outputUrl ? (
                     <video
                         key={videoKey}
                         src={outputUrl}
@@ -77,6 +90,11 @@ export default function ThreeDVisualExplanationPage() {
                         muted
                         loop
                     />
+                ) : (
+                    <div className="text-center text-muted-foreground">
+                        <Cuboid className="mx-auto h-12 w-12 mb-4" />
+                        <p>Enter a prompt to generate a visual explanation.</p>
+                    </div>
                 )}
             </CardContent>
         </Card>

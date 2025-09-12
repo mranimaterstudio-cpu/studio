@@ -3,24 +3,15 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Wand } from 'lucide-react';
+import { Loader2, Sparkles, Wand, Cuboid } from 'lucide-react';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
-import { generateVisualExplanation } from '@/ai/flows/generate-visual-explanation';
-import { z } from 'zod';
+import { find3dModel } from '@/ai/flows/find-3d-model';
 import Image from 'next/image';
-
-const VisualExplanationSchema = z.object({
-  title: z.string(),
-  explanation: z.string(),
-  imagePrompt: z.string(),
-});
-
-type VisualExplanation = z.infer<typeof VisualExplanationSchema>;
 
 
 export function ImageGenerationPageClient() {
   const [prompt, setPrompt] = useState('');
-  const [result, setResult] = useState<{explanation: VisualExplanation, imageUrl: string | null} | null>(null);
+  const [modelUid, setModelUid] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -28,30 +19,31 @@ export function ImageGenerationPageClient() {
     if (!prompt.trim()) {
       toast({
         title: 'Prompt is empty',
-        description: 'Please enter a prompt to generate a visual explanation.',
+        description: 'Please enter a prompt to search for a 3D model.',
         variant: 'destructive',
       });
       return;
     }
     setIsGenerating(true);
-    setResult(null);
+    setModelUid(null);
 
     try {
-      const generationResult = await generateVisualExplanation(prompt);
-      if (generationResult.explanation && generationResult.imageUrl) {
-        setResult(generationResult);
+      const result = await find3dModel(prompt);
+      if (result.modelUid) {
+        setModelUid(result.modelUid);
       } else {
         toast({
-          title: 'Generation failed',
-          description: 'Could not generate a visual explanation. Please try again.',
+          title: 'No models found',
+          description:
+            'Could not find a matching 3D model. Please try a different search term.',
           variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: 'Generation Failed',
+        title: 'Search Failed',
         description:
-          'An error occurred during generation. Please check the console for details.',
+          'Could not search for the 3D model. Please check the console for details.',
         variant: 'destructive',
       });
       console.error(error);
@@ -70,7 +62,7 @@ export function ImageGenerationPageClient() {
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
-            <Wand /> Image Generation
+            <Cuboid /> 3D Model Finder
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -84,13 +76,13 @@ export function ImageGenerationPageClient() {
                   id="prompt-input"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., A futuristic cityscape at sunset"
+                  placeholder="e.g., A futuristic car"
                   disabled={isGenerating}
                   suppressHydrationWarning
                 />
               </PromptInputWrapper>
               <p className="text-xs text-muted-foreground">
-                Enter a concept and the AI will generate an image and explanation.
+                Enter a concept and the AI will find a 3D model from Sketchfab.
               </p>
             </div>
             <div className="flex gap-2 pt-4">
@@ -104,7 +96,7 @@ export function ImageGenerationPageClient() {
                 ) : (
                   <Sparkles />
                 )}
-                Generate
+                Search
               </Button>
             </div>
           </form>
@@ -119,24 +111,22 @@ export function ImageGenerationPageClient() {
           {isGenerating ? (
             <div className="flex flex-col items-center gap-4 text-muted-foreground">
               <Loader2 className="w-16 h-16 animate-spin text-primary" />
-              <p>Generating... this may take a moment.</p>
+              <p>Searching for 3D model...</p>
             </div>
-          ) : result ? (
-             <div className="space-y-4 w-full max-w-2xl mx-auto">
-                {result.imageUrl && (
-                    <div className="relative aspect-video w-full rounded-md overflow-hidden border">
-                        <Image src={result.imageUrl} alt={result.explanation.title} fill className="object-cover" />
-                    </div>
-                )}
-                <div className='space-y-2'>
-                    <h3 className="text-xl font-bold">{result.explanation.title}</h3>
-                    <p className="text-muted-foreground whitespace-pre-wrap">{result.explanation.explanation}</p>
-                </div>
+          ) : modelUid ? (
+             <div className="relative aspect-video w-full max-w-2xl rounded-md overflow-hidden border">
+                <iframe
+                    title="Sketchfab Viewer"
+                    src={`https://sketchfab.com/models/${modelUid}/embed?autospin=1&autostart=1`}
+                    allowFullScreen
+                    allow="autoplay; fullscreen; xr-spatial-tracking"
+                    className="w-full h-full"
+                ></iframe>
             </div>
           ) : (
             <div className="text-center text-muted-foreground">
-                <Wand className="mx-auto h-12 w-12 mb-4" />
-                <p>Your generated image and explanation will appear here.</p>
+                <Cuboid className="mx-auto h-12 w-12 mb-4" />
+                <p>Your 3D model will appear here.</p>
             </div>
           )}
         </CardContent>

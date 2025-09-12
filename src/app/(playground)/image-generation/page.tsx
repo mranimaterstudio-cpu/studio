@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -13,6 +12,7 @@ import { generateId } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
 
 const placeholder = PlaceHolderImages.find(p => p.id === 'image-generation-placeholder')!;
 
@@ -83,6 +83,11 @@ export default function ImageGenerationPage() {
     }
     setIsSuggestionsLoading(false);
   };
+  
+  const handlePromptSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleGenerate();
+  }
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
@@ -91,25 +96,29 @@ export default function ImageGenerationPage() {
           <CardTitle className="font-headline">Image Generation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="prompt-input" className="font-medium">Prompt</label>
-            <div className="flex items-center gap-2">
-               <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading}>
-                {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary" />}
-              </Button>
-              <Input
-                id="prompt-input"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g., A cat in a space suit, digital art"
-              />
-            </div>
-          </div>
-           <div className="flex flex-wrap gap-2">
-            {suggestions.map((s, i) => (
-              <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => setPrompt(s)}>{s}</Badge>
-            ))}
-          </div>
+          <form onSubmit={handlePromptSubmit} className="space-y-4">
+             <div className="space-y-2">
+                <label htmlFor="prompt-input" className="font-medium">Prompt</label>
+                 <div className="flex items-center gap-2">
+                   <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12 flex-shrink-0">
+                    {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
+                  </Button>
+                  <PromptInputWrapper className="w-full">
+                    <PromptInput
+                      id="prompt-input"
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      placeholder="e.g., A cat in a space suit, digital art"
+                    />
+                  </PromptInputWrapper>
+                </div>
+              </div>
+               <div className="flex flex-wrap gap-2 pl-14">
+                {suggestions.map((s, i) => (
+                  <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => setPrompt(s)}>{s}</Badge>
+                ))}
+              </div>
+          </form>
 
           <div className="space-y-2">
             <label htmlFor="model-select" className="font-medium">Model</label>

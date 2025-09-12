@@ -1,7 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -9,10 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { Experiment, Message, Personality } from '@/lib/types';
 import { generatePromptSuggestions } from '@/ai/flows/generate-prompt-suggestions';
-import { Bot, User, Sparkles, Save, Loader2 } from 'lucide-react';
+import { Bot, User, Sparkles, Save, Loader2, Mic, Camera } from 'lucide-react';
 import { generateId } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { PromptInput, PromptInputWrapper, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input';
 
 const personalityPrompts: Record<Personality, string> = {
   general: "You are a helpful general-purpose AI assistant.",
@@ -166,20 +166,25 @@ export default function ChatPage() {
             ))}
           </div>
           <div className="w-full flex items-center gap-2">
-            <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading}>
-              {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary" />}
-            </Button>
-            <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(input); }} className="flex-1 flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1"
-                disabled={isLoading}
-              />
-              <Button type="submit" disabled={isLoading || !input.trim()} className="shadow-md shadow-primary/30">
-                Send
+             <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12">
+                {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
               </Button>
+            <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(input); }} className="flex-1 flex gap-2">
+                <PromptInputWrapper>
+                  <PromptInput
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your message..."
+                    disabled={isLoading}
+                  />
+                  <PromptInputActions>
+                    <PromptInputAction disabled={isLoading}><Mic/></PromptInputAction>
+                    <PromptInputAction disabled={isLoading}><Camera/></PromptInputAction>
+                     <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    </Button>
+                  </PromptInputActions>
+                </PromptInputWrapper>
             </form>
           </div>
         </CardFooter>

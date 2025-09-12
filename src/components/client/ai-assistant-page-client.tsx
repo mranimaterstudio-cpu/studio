@@ -68,74 +68,72 @@ export function AiAssistantPageClient() {
     };
 
     return (
-        <div className="relative flex flex-col h-[calc(100vh-8rem)] w-full overflow-hidden bg-background rounded-2xl bg-vignette">
-             <Card className="flex-1 flex flex-col bg-transparent border-0 z-20">
-                <CardContent className="p-0 flex-1 relative">
-                    <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
-                        <div className="p-6 space-y-6 max-w-3xl mx-auto">
-                            {messages.map((message) => (
-                                <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
-                                {message.role === 'assistant' && (
-                                    <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
-                                    <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
-                                    </Avatar>
-                                )}
-                                <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary/80'}`}>
-                                    <p className="whitespace-pre-wrap">{message.content}</p>
-                                </div>
-                                {message.role === 'user' && (
-                                    <Avatar className="w-8 h-8 border-2 border-accent shadow-lg shadow-accent/30">
-                                    <AvatarFallback className="bg-transparent"><User className="w-5 h-5 text-accent" /></AvatarFallback>
-                                    </Avatar>
-                                )}
-                                </div>
-                            ))}
-                            {isLoading && (
-                                <div className="flex items-start gap-4">
-                                    <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
-                                        <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
-                                    </Avatar>
-                                    <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center">
-                                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                                    </div>
-                                </div>
+        <Card className="relative flex flex-col h-[calc(100vh-8rem)] w-full overflow-hidden bg-background rounded-2xl bg-vignette border-0 z-20">
+            <CardContent className="p-0 flex-1 relative">
+                <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
+                    <div className="p-6 space-y-6 max-w-3xl mx-auto">
+                        {messages.map((message) => (
+                            <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                            {message.role === 'assistant' && (
+                                <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
+                                <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
+                                </Avatar>
                             )}
-                        </div>
-                    </ScrollArea>
-                </CardContent>
+                            <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary/80'}`}>
+                                <p className="whitespace-pre-wrap">{message.content}</p>
+                            </div>
+                            {message.role === 'user' && (
+                                <Avatar className="w-8 h-8 border-2 border-accent shadow-lg shadow-accent/30">
+                                <AvatarFallback className="bg-transparent"><User className="w-5 h-5 text-accent" /></AvatarFallback>
+                                </Avatar>
+                            )}
+                            </div>
+                        ))}
+                        {isLoading && (
+                            <div className="flex items-start gap-4">
+                                <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
+                                    <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
+                                </Avatar>
+                                <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center">
+                                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </ScrollArea>
+            </CardContent>
 
-                <CardFooter className="p-4 flex-col items-start gap-2 z-10">
-                    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
-                        <PromptInputWrapper>
+            <CardFooter className="p-4 flex-col items-start gap-2 z-10">
+                <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
+                    <PromptInputWrapper>
+                        <PromptInputAction suppressHydrationWarning>
+                            <Sparkles className="text-primary"/>
+                        </PromptInputAction>
+                        <PromptInput
+                            type="text"
+                            placeholder="Type your message..."
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            disabled={isLoading}
+                            suppressHydrationWarning
+                        />
+                        <PromptInputActions>
                             <PromptInputAction suppressHydrationWarning>
-                                <Sparkles className="text-primary"/>
+                                <Search className="text-muted-foreground" />
                             </PromptInputAction>
-                            <PromptInput
-                                type="text"
-                                placeholder="Type your message..."
-                                value={prompt}
-                                onChange={(e) => setPrompt(e.target.value)}
-                                disabled={isLoading}
+                            <Button
+                                type="submit"
+                                size="icon"
+                                className="w-9 h-9 rounded-full bg-primary cursor-pointer"
+                                disabled={isLoading || !prompt.trim()}
                                 suppressHydrationWarning
-                            />
-                            <PromptInputActions>
-                                <PromptInputAction suppressHydrationWarning>
-                                    <Search className="text-muted-foreground" />
-                                </PromptInputAction>
-                                <Button
-                                    type="submit"
-                                    size="icon"
-                                    className="w-9 h-9 rounded-full bg-primary cursor-pointer"
-                                    disabled={isLoading || !prompt.trim()}
-                                    suppressHydrationWarning
-                                >
-                                    {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-primary-foreground w-4 h-4 fill-current" />}
-                                </Button>
-                            </PromptInputActions>
-                        </PromptInputWrapper>
-                    </form>
-                </CardFooter>
-            </Card>
-        </div>
+                            >
+                                {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-primary-foreground w-4 h-4 fill-current" />}
+                            </Button>
+                        </PromptInputActions>
+                    </PromptInputWrapper>
+                </form>
+            </CardFooter>
+        </Card>
     );
 }

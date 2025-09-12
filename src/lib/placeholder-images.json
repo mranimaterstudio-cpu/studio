@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "image-generation-placeholder",
+      "description": "Placeholder for AI generated images.",
+      "imageUrl": "https://picsum.photos/seed/placeholder/512/512",
+      "imageHint": "abstract tech"
+    }
+  ]
 }

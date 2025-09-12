@@ -2,18 +2,18 @@
 'use client';
 
 import { assistantChat } from '@/ai/flows/assistant-chat';
-import { extractTextFromImage } from '@/ai/flows/extract-text-from-image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Sparkles, User, Search, Camera, VideoOff, CircleDot, X } from 'lucide-react';
+import { Bot, Loader2, User, Camera, VideoOff, CircleDot, X } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateId } from '@/lib/utils';
 import type { Message } from '@/lib/types';
-import { PromptInput, PromptInputWrapper, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input';
+import { PromptInput, PromptInputWrapper, PromptInputActions } from '@/components/ui/prompt-input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Image from 'next/image';
 
 
 function PaperPlaneIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -82,37 +82,18 @@ export function AiAssistantPageClient() {
 
 
     const handleSendMessage = async (messageContent?: string) => {
-        let content = messageContent || prompt;
+        const content = messageContent || prompt;
         if (!content.trim() && !imageUrl) return;
 
         setIsLoading(true);
 
-        if (imageUrl) {
-            try {
-                const ocrResult = await extractTextFromImage({ photoDataUri: imageUrl });
-                content = ocrResult.extractedText;
-                toast({ title: "Text Extracted", description: "The text from the image has been extracted and used as the prompt." });
-                setImageUrl(null);
-                setShowCamera(false);
-            } catch (error) {
-                console.error(error);
-                toast({
-                    title: 'Error extracting text',
-                    description: 'Could not extract text from the image. Please try again.',
-                    variant: 'destructive',
-                });
-                setIsLoading(false);
-                return;
-            }
-        }
-
-        const userMessage: Message = { id: generateId(), role: 'user', content: content };
+        const userMessage: Message = { id: generateId(), role: 'user', content: content || "Image Analysis" };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setPrompt('');
-
+        
         try {
-            const response = await assistantChat(content);
+            const response = await assistantChat(content, imageUrl || undefined);
             const aiResponse: Message = {
                 id: generateId(),
                 role: 'assistant',
@@ -128,6 +109,9 @@ export function AiAssistantPageClient() {
             });
             setMessages(messages); // Revert messages if AI fails
         }
+        
+        setImageUrl(null);
+        setShowCamera(false);
         setIsLoading(false);
     };
 
@@ -142,6 +126,7 @@ export function AiAssistantPageClient() {
                 context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
                 const dataUrl = canvas.toDataURL('image/png');
                 setImageUrl(dataUrl);
+                setShowCamera(false);
             }
         }
       }
@@ -151,7 +136,8 @@ export function AiAssistantPageClient() {
       }
 
     return (
-        messages.length === 0 ? (
+        <div className="h-full flex flex-col w-full bg-transparent">
+        {messages.length === 0 ? (
             <div className="flex flex-col h-full w-full justify-center items-center">
                 <div className="w-full max-w-3xl px-8 text-center">
                     <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
@@ -160,15 +146,6 @@ export function AiAssistantPageClient() {
                     {showCamera ? (
                          <div className='w-full flex flex-col items-center justify-center gap-4 bg-transparent mb-10'>
                             <div className="relative aspect-video w-full border-2 border-dashed rounded-lg flex items-center justify-center overflow-hidden">
-                                {imageUrl ? (
-                                    <>
-                                        <img src={imageUrl} alt="Captured content" className="h-full object-contain" />
-                                        <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={handleRemoveImage} suppressHydrationWarning>
-                                        <X/>
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <>
                                     {hasCameraPermission === null && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
                                     {hasCameraPermission === false && (
                                         <Alert variant="destructive">
@@ -187,12 +164,19 @@ export function AiAssistantPageClient() {
                                             </Button>
                                         </>
                                     )}
-                                    </>
-                                )}
                             </div>
                             <Button onClick={() => setShowCamera(false)} variant="ghost" suppressHydrationWarning>Close Camera</Button>
                         </div>
                     ) : (
+                        <>
+                        {imageUrl && (
+                            <div className="relative w-48 h-32 mx-auto mb-4 rounded-lg overflow-hidden border-2 border-primary">
+                                <Image src={imageUrl} alt="Captured content" layout="fill" className="object-cover"/>
+                                 <Button variant="destructive" size="icon" className="absolute top-1 right-1 z-10 h-6 w-6" onClick={handleRemoveImage} suppressHydrationWarning>
+                                    <X className="h-4 w-4"/>
+                                </Button>
+                            </div>
+                        )}
                         <div className="gradient-border mb-10">
                             <div className="input-container bg-[rgba(18,18,18,0.9)] flex items-center p-2 rounded-full">
                                 <input
@@ -216,6 +200,7 @@ export function AiAssistantPageClient() {
                                 </div>
                             </div>
                         </div>
+                        </>
                     )}
                     <canvas ref={canvasRef} className="hidden" />
 
@@ -268,11 +253,16 @@ export function AiAssistantPageClient() {
                 </CardContent>
 
                 <CardFooter className="p-4 flex-col items-start gap-2 z-10">
+                     {imageUrl && (
+                        <div className="relative w-24 h-16 mx-auto mb-2 rounded-md overflow-hidden border">
+                             <Image src={imageUrl} alt="Captured content" layout="fill" className="object-cover"/>
+                            <Button variant="destructive" size="icon" className="absolute top-1 right-1 z-10 h-5 w-5" onClick={handleRemoveImage} suppressHydrationWarning>
+                                <X className="h-3 w-3"/>
+                            </Button>
+                        </div>
+                    )}
                     <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
                         <PromptInputWrapper>
-                            <PromptInputAction suppressHydrationWarning>
-                                <Sparkles className="text-primary" />
-                            </PromptInputAction>
                             <PromptInput
                                 type="text"
                                 placeholder="Type your message..."
@@ -282,14 +272,20 @@ export function AiAssistantPageClient() {
                                 suppressHydrationWarning
                             />
                             <PromptInputActions>
-                                <PromptInputAction onClick={() => setShowCamera(true)} suppressHydrationWarning>
-                                    <Camera className="text-muted-foreground" />
-                                </PromptInputAction>
+                                <Button
+                                  onClick={() => setShowCamera(true)}
+                                  size="icon"
+                                  variant="ghost"
+                                  className="w-9 h-9 rounded-full text-muted-foreground"
+                                  suppressHydrationWarning
+                                >
+                                  <Camera/>
+                                </Button>
                                 <Button
                                     type="submit"
                                     size="icon"
                                     className="w-9 h-9 rounded-full bg-primary cursor-pointer"
-                                    disabled={isLoading || !prompt.trim()}
+                                    disabled={isLoading || (!prompt.trim() && !imageUrl)}
                                     suppressHydrationWarning
                                 >
                                     {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-primary-foreground w-4 h-4 fill-current" />}
@@ -299,8 +295,7 @@ export function AiAssistantPageClient() {
                     </form>
                 </CardFooter>
             </Card>
-        )
+        )}
+        </div>
     );
 }
-
-    

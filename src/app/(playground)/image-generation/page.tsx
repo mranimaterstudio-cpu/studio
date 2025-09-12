@@ -1,5 +1,5 @@
-import { VisualExplanationPageClient } from '@/components/client/visual-explanation-page-client';
+import { ImageGenerationPageClient } from '@/components/client/image-generation-page-client';
 
-export default function VisualExplanationPage() {
-  return <VisualExplanationPageClient />;
+export default function ImageGenerationPage() {
+  return <ImageGenerationPageClient />;
 }

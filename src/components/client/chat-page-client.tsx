@@ -190,8 +190,6 @@ export function ChatPageClient() {
                     suppressHydrationWarning
                   />
                   <PromptInputActions>
-                    <PromptInputAction disabled={isLoading} suppressHydrationWarning><Mic/></PromptInputAction>
-                    <PromptInputAction disabled={isLoading} suppressHydrationWarning><Camera/></PromptInputAction>
                      <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30" suppressHydrationWarning>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                     </Button>

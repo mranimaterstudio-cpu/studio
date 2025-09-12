@@ -1,5 +1,5 @@
-import {VideoGenerationPageClient} from '@/components/client/video-generation-page-client';
+import { VisualExplanationPageClient } from '@/components/client/visual-explanation-page-client';
 
-export default function VideoGenerationPage() {
-  return <VideoGenerationPageClient />;
+export default function VisualExplanationPage() {
+  return <VisualExplanationPageClient />;
 }

@@ -86,10 +86,6 @@ export default function ThreeDVisualExplanationPage() {
     <div className="grid md:grid-cols-2 gap-8">
       <Card className="bg-card/50">
         <CardHeader>
-          <CardTitle className="font-headline flex items-center gap-2">
-            <Cuboid/>
-            3D Visual Explanation
-          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
             <form onSubmit={handlePromptSubmit} className="space-y-4" suppressHydrationWarning>

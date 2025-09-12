@@ -2,16 +2,18 @@
 'use client';
 
 import { assistantChat } from '@/ai/flows/assistant-chat';
+import { extractTextFromImage } from '@/ai/flows/extract-text-from-image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Sparkles, User, Search, Mic, Camera } from 'lucide-react';
+import { Bot, Loader2, Sparkles, User, Search, Camera, VideoOff, CircleDot, X } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateId } from '@/lib/utils';
 import type { Message } from '@/lib/types';
 import { PromptInput, PromptInputWrapper, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function PaperPlaneIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -34,25 +36,80 @@ export function AiAssistantPageClient() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
-    
+    const [showCamera, setShowCamera] = useState(false);
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
     useEffect(() => {
-        setTimeout(() => {
-            if (scrollAreaViewportRef.current) {
-                scrollAreaViewportRef.current.scrollTop = scrollAreaViewportRef.current.scrollHeight;
+        if (scrollAreaViewportRef.current) {
+            scrollAreaViewportRef.current.scrollTop = scrollAreaViewportRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+    useEffect(() => {
+        if (showCamera) {
+          const getCameraPermission = async () => {
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+              setHasCameraPermission(true);
+    
+              if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+              }
+            } catch (error) {
+              console.error('Error accessing camera:', error);
+              setHasCameraPermission(false);
+              toast({
+                variant: 'destructive',
+                title: 'Camera Access Denied',
+                description: 'Please enable camera permissions in your browser settings to use this app.',
+              });
             }
-        }, 0);
-      }, [messages]);
+          };
+    
+          getCameraPermission();
+          
+          return () => {
+            if (videoRef.current && videoRef.current.srcObject) {
+                const stream = videoRef.current.srcObject as MediaStream;
+                stream.getTracks().forEach(track => track.stop());
+            }
+          }
+        }
+      }, [showCamera, toast]);
 
 
     const handleSendMessage = async (messageContent?: string) => {
-        const content = messageContent || prompt;
-        if (!content.trim()) return;
+        let content = messageContent || prompt;
+        if (!content.trim() && !imageUrl) return;
+
+        setIsLoading(true);
+
+        if (imageUrl) {
+            try {
+                const ocrResult = await extractTextFromImage({ photoDataUri: imageUrl });
+                content = ocrResult.extractedText;
+                toast({ title: "Text Extracted", description: "The text from the image has been extracted and used as the prompt." });
+                setImageUrl(null);
+                setShowCamera(false);
+            } catch (error) {
+                console.error(error);
+                toast({
+                    title: 'Error extracting text',
+                    description: 'Could not extract text from the image. Please try again.',
+                    variant: 'destructive',
+                });
+                setIsLoading(false);
+                return;
+            }
+        }
 
         const userMessage: Message = { id: generateId(), role: 'user', content: content };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setPrompt('');
-        setIsLoading(true);
 
         try {
             const response = await assistantChat(content);
@@ -74,18 +131,73 @@ export function AiAssistantPageClient() {
         setIsLoading(false);
     };
 
+    const handleCapture = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                const dataUrl = canvas.toDataURL('image/png');
+                setImageUrl(dataUrl);
+            }
+        }
+      }
+
+      const handleRemoveImage = () => {
+        setImageUrl(null);
+      }
+
     return (
-            messages.length === 0 ? (
-                <div className="flex flex-col h-full w-full justify-center items-center">
-                    <div className="w-full max-w-3xl px-8 text-center">
-                        <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
-                        <p className="text-gray-400 text-xl mb-12">Ask anything, get intelligent responses</p>
-                        
+        messages.length === 0 ? (
+            <div className="flex flex-col h-full w-full justify-center items-center">
+                <div className="w-full max-w-3xl px-8 text-center">
+                    <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
+                    <p className="text-gray-400 text-xl mb-12">Ask anything, get intelligent responses</p>
+
+                    {showCamera ? (
+                         <div className='w-full flex flex-col items-center justify-center gap-4 bg-transparent mb-10'>
+                            <div className="relative aspect-video w-full border-2 border-dashed rounded-lg flex items-center justify-center overflow-hidden">
+                                {imageUrl ? (
+                                    <>
+                                        <img src={imageUrl} alt="Captured content" className="h-full object-contain" />
+                                        <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={handleRemoveImage} suppressHydrationWarning>
+                                        <X/>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                    {hasCameraPermission === null && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
+                                    {hasCameraPermission === false && (
+                                        <Alert variant="destructive">
+                                            <VideoOff className="h-4 w-4"/>
+                                            <AlertTitle>Camera Access Denied</AlertTitle>
+                                            <AlertDescription>
+                                                Please enable camera permissions in your browser settings.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                    {hasCameraPermission && (
+                                        <>
+                                            <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                                            <Button onClick={handleCapture} className="absolute bottom-4 z-10 shadow-lg shadow-primary/40 rounded-full" size="lg" suppressHydrationWarning>
+                                                <CircleDot className="mr-2"/> Capture
+                                            </Button>
+                                        </>
+                                    )}
+                                    </>
+                                )}
+                            </div>
+                            <Button onClick={() => setShowCamera(false)} variant="ghost" suppressHydrationWarning>Close Camera</Button>
+                        </div>
+                    ) : (
                         <div className="gradient-border mb-10">
                             <div className="input-container bg-[rgba(18,18,18,0.9)] flex items-center p-2 rounded-full">
-                                <input 
-                                    type="text" 
-                                    placeholder="Ask anything..." 
+                                <input
+                                    type="text"
+                                    placeholder="Ask anything or use the camera to scan text..."
                                     className="bg-transparent w-full outline-none text-xl px-6 py-4"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
@@ -95,36 +207,40 @@ export function AiAssistantPageClient() {
                                     suppressHydrationWarning
                                 />
                                 <div className="flex space-x-1 pr-2">
-                                    <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Camera className="text-green-400"/></Button>
+                                     <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" onClick={() => setShowCamera(true)} suppressHydrationWarning>
+                                        <Camera className="text-green-400" />
+                                    </Button>
                                     <Button size="icon" className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 pulse-animation" onClick={() => handleSendMessage()} suppressHydrationWarning>
-                                        <PaperPlaneIcon className="w-6 h-6 fill-current"/>
+                                        <PaperPlaneIcon className="w-6 h-6 fill-current" />
                                     </Button>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div>
-                            <h3 className="text-xl font-semibold mb-4 text-center text-gray-300">Try asking:</h3>
-                            <div className="grid grid-cols-1 gap-3">
-                                {examplePrompts.map((p, i) => (
-                                     <div key={i} className="example-card p-4 rounded-lg cursor-pointer bg-white/5 backdrop-blur-sm border border-white/10" onClick={() => handleSendMessage(p)} suppressHydrationWarning>
-                                        <p className="text-lg">{p}</p>
-                                    </div>
-                                ))}
-                            </div>
+                    )}
+                    <canvas ref={canvasRef} className="hidden" />
+
+                    <div>
+                        <h3 className="text-xl font-semibold mb-4 text-center text-gray-300">Try asking:</h3>
+                        <div className="grid grid-cols-1 gap-3">
+                            {examplePrompts.map((p, i) => (
+                                <div key={i} className="example-card p-4 rounded-lg cursor-pointer bg-white/5 backdrop-blur-sm border border-white/10" onClick={() => handleSendMessage(p)} suppressHydrationWarning>
+                                    <p className="text-lg">{p}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
-            ) : (
-                <Card className="h-full flex flex-col w-full bg-card/50 rounded-2xl overflow-hidden">
-                    <CardContent className="p-0 flex-1 relative">
-                        <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
-                            <div className="p-6 space-y-6 max-w-3xl mx-auto">
-                                {messages.map((message) => (
-                                    <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`} suppressHydrationWarning>
+            </div>
+        ) : (
+            <Card className="h-full flex flex-col w-full bg-card/50 rounded-2xl overflow-hidden">
+                <CardContent className="p-0 flex-1 relative">
+                    <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
+                        <div className="p-6 space-y-6 max-w-3xl mx-auto">
+                            {messages.map((message) => (
+                                <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`} suppressHydrationWarning>
                                     {message.role === 'assistant' && (
                                         <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30" suppressHydrationWarning>
-                                        <AvatarFallback className="bg-transparent" suppressHydrationWarning><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
+                                            <AvatarFallback className="bg-transparent" suppressHydrationWarning><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                                         </Avatar>
                                     )}
                                     <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary/80'}`} suppressHydrationWarning>
@@ -132,57 +248,59 @@ export function AiAssistantPageClient() {
                                     </div>
                                     {message.role === 'user' && (
                                         <Avatar className="w-8 h-8 border-2 border-accent shadow-lg shadow-accent/30" suppressHydrationWarning>
-                                        <AvatarFallback className="bg-transparent" suppressHydrationWarning><User className="w-5 h-5 text-accent" /></AvatarFallback>
+                                            <AvatarFallback className="bg-transparent" suppressHydrationWarning><User className="w-5 h-5 text-accent" /></AvatarFallback>
                                         </Avatar>
                                     )}
+                                </div>
+                            ))}
+                            {isLoading && (
+                                <div className="flex items-start gap-4" suppressHydrationWarning>
+                                    <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30" suppressHydrationWarning>
+                                        <AvatarFallback className="bg-transparent" suppressHydrationWarning><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
+                                    </Avatar>
+                                    <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center" suppressHydrationWarning>
+                                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
                                     </div>
-                                ))}
-                                {isLoading && (
-                                    <div className="flex items-start gap-4" suppressHydrationWarning>
-                                        <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30" suppressHydrationWarning>
-                                            <AvatarFallback className="bg-transparent" suppressHydrationWarning><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
-                                        </Avatar>
-                                        <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center" suppressHydrationWarning>
-                                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </ScrollArea>
-                    </CardContent>
+                                </div>
+                            )}
+                        </div>
+                    </ScrollArea>
+                </CardContent>
 
-                    <CardFooter className="p-4 flex-col items-start gap-2 z-10">
-                        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
-                            <PromptInputWrapper>
-                                <PromptInputAction suppressHydrationWarning>
-                                    <Sparkles className="text-primary"/>
+                <CardFooter className="p-4 flex-col items-start gap-2 z-10">
+                    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
+                        <PromptInputWrapper>
+                            <PromptInputAction suppressHydrationWarning>
+                                <Sparkles className="text-primary" />
+                            </PromptInputAction>
+                            <PromptInput
+                                type="text"
+                                placeholder="Type your message..."
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                disabled={isLoading}
+                                suppressHydrationWarning
+                            />
+                            <PromptInputActions>
+                                <PromptInputAction onClick={() => setShowCamera(true)} suppressHydrationWarning>
+                                    <Camera className="text-muted-foreground" />
                                 </PromptInputAction>
-                                <PromptInput
-                                    type="text"
-                                    placeholder="Type your message..."
-                                    value={prompt}
-                                    onChange={(e) => setPrompt(e.target.value)}
-                                    disabled={isLoading}
+                                <Button
+                                    type="submit"
+                                    size="icon"
+                                    className="w-9 h-9 rounded-full bg-primary cursor-pointer"
+                                    disabled={isLoading || !prompt.trim()}
                                     suppressHydrationWarning
-                                />
-                                <PromptInputActions>
-                                    <PromptInputAction suppressHydrationWarning>
-                                        <Search className="text-muted-foreground" />
-                                    </PromptInputAction>
-                                    <Button
-                                        type="submit"
-                                        size="icon"
-                                        className="w-9 h-9 rounded-full bg-primary cursor-pointer"
-                                        disabled={isLoading || !prompt.trim()}
-                                        suppressHydrationWarning
-                                    >
-                                        {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-primary-foreground w-4 h-4 fill-current" />}
-                                    </Button>
-                                </PromptInputActions>
-                            </PromptInputWrapper>
-                        </form>
-                    </CardFooter>
-                </Card>
-            )
+                                >
+                                    {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-primary-foreground w-4 h-4 fill-current" />}
+                                </Button>
+                            </PromptInputActions>
+                        </PromptInputWrapper>
+                    </form>
+                </CardFooter>
+            </Card>
+        )
     );
 }
+
+    

@@ -110,11 +110,11 @@ export function ChatPageClient() {
     <div className="h-[calc(100vh-10rem)] md:h-[calc(100vh-8rem)] flex flex-col gap-4">
       <Card className="flex-1 flex flex-col bg-card/50">
         <CardHeader className="border-b">
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2" suppressHydrationWarning>
             <h2 className="text-2xl font-bold font-headline">Chatbot</h2>
             <div className="flex items-center gap-2">
               <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)}>
-                <SelectTrigger className="w-[180px] shadow-sm shadow-primary/20">
+                <SelectTrigger className="w-[180px] shadow-sm shadow-primary/20" suppressHydrationWarning>
                   <SelectValue placeholder="Select Personality" />
                 </SelectTrigger>
                 <SelectContent>
@@ -124,7 +124,7 @@ export function ChatPageClient() {
                   <SelectItem value="sarcastic">Sarcastic</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={handleSaveExperiment} variant="outline" className="shadow-sm shadow-primary/20">
+              <Button onClick={handleSaveExperiment} variant="outline" className="shadow-sm shadow-primary/20" suppressHydrationWarning>
                 <Save className="mr-2" /> Save
               </Button>
             </div>
@@ -175,8 +175,8 @@ export function ChatPageClient() {
               <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => handleSendMessage(s)}>{s}</Badge>
             ))}
           </div>
-          <div className="w-full flex items-center gap-2">
-             <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12">
+          <div className="w-full flex items-center gap-2" suppressHydrationWarning>
+             <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12" suppressHydrationWarning>
                 {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
               </Button>
             <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(input); }} className="flex-1 flex gap-2">
@@ -188,9 +188,9 @@ export function ChatPageClient() {
                     disabled={isLoading}
                   />
                   <PromptInputActions>
-                    <PromptInputAction disabled={isLoading}><Mic/></PromptInputAction>
-                    <PromptInputAction disabled={isLoading}><Camera/></PromptInputAction>
-                     <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30">
+                    <PromptInputAction disabled={isLoading} suppressHydrationWarning><Mic/></PromptInputAction>
+                    <PromptInputAction disabled={isLoading} suppressHydrationWarning><Camera/></PromptInputAction>
+                     <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30" suppressHydrationWarning>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                     </Button>
                   </PromptInputActions>

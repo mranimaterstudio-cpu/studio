@@ -86,31 +86,6 @@ export default function ThreeDVisualExplanationPage() {
       <Card className="bg-card/50">
         <CardHeader>
         </CardHeader>
-        <CardContent className="space-y-6">
-            <form onSubmit={handlePromptSubmit} className="space-y-4" suppressHydrationWarning>
-                 <div className="space-y-2">
-                    <label htmlFor="prompt-input" className="font-medium">Prompt</label>
-                    <div className="flex items-center gap-2">
-                        <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12 shrink-0">
-                            {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
-                        </Button>
-                         <PromptInputWrapper className="w-full">
-                            <PromptInput 
-                                id="prompt-input" 
-                                value={prompt} 
-                                onChange={(e) => setPrompt(e.target.value)}
-                                placeholder="e.g., A detailed model of the solar system"
-                            />
-                        </PromptInputWrapper>
-                    </div>
-                     <div className="flex flex-wrap gap-2 px-14">
-                        {suggestions.map((s, i) => (
-                        <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => {setPrompt(s); handleGenerate();}}>{s}</Badge>
-                        ))}
-                    </div>
-                </div>
-            </form>
-        </CardContent>
         <CardFooter className="flex gap-2" suppressHydrationWarning>
             <Button onClick={handleGenerate} disabled={isGenerating} className="flex-1 shadow-md shadow-primary/30">
                 {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}

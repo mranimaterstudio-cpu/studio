@@ -19,7 +19,7 @@ const VisualExplanationSchema = z.object({
   imagePrompt: z
     .string()
     .describe(
-      'A descriptive prompt for an image generation model to create a relevant visual aid.'
+      'A descriptive prompt for an image generation model to create a single, visually engaging image to accompany the explanation. The prompt should be detailed and specific to generate a high-quality, relevant image.'
     ),
 });
 

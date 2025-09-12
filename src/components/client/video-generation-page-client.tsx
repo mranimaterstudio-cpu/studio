@@ -83,7 +83,7 @@ export function VideoGenerationPageClient() {
                   id="prompt-input"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., A majestic dragon soaring over a mystical forest"
+                  placeholder="e.g., How does photosynthesis work?"
                   disabled={isGenerating}
                   suppressHydrationWarning
                 />

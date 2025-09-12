@@ -3,9 +3,9 @@
 
 import { assistantChat } from '@/ai/flows/assistant-chat';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Camera, Loader2, Mic, PaperPlane, Sparkles, User } from 'lucide-react';
+import { Bot, Loader2, Sparkles, User } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -104,7 +104,7 @@ export function AiAssistantPageClient() {
                 </CardContent>
 
                 <CardFooter className="p-4 flex-col items-start gap-2 z-10">
-                    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
+                    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx--auto">
                         <PromptInputWrapper>
                             <PromptInputAction suppressHydrationWarning>
                                 <Sparkles className="text-primary"/>

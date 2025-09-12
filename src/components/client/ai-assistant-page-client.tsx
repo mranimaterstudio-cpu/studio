@@ -95,7 +95,6 @@ export function AiAssistantPageClient() {
                                     suppressHydrationWarning
                                 />
                                 <div className="flex space-x-1 pr-2">
-                                    <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Mic className="text-blue-400"/></Button>
                                     <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Camera className="text-green-400"/></Button>
                                     <Button size="icon" className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 pulse-animation" onClick={() => handleSendMessage()} suppressHydrationWarning>
                                         <PaperPlaneIcon className="w-6 h-6 fill-current"/>

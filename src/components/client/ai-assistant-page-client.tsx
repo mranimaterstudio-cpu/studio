@@ -1,3 +1,4 @@
+
 'use client';
 
 import { assistantChat } from '@/ai/flows/assistant-chat';
@@ -91,11 +92,12 @@ export function AiAssistantPageClient() {
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleSendMessage();
                                 }}
+                                suppressHydrationWarning
                             />
                             <div className="flex space-x-1 pr-2">
-                                <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10"><Mic className="text-blue-400"/></Button>
-                                <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10"><Camera className="text-green-400"/></Button>
-                                <Button size="icon" className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 pulse-animation" onClick={() => handleSendMessage()}>
+                                <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Mic className="text-blue-400"/></Button>
+                                <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Camera className="text-green-400"/></Button>
+                                <Button size="icon" className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 pulse-animation" onClick={() => handleSendMessage()} suppressHydrationWarning>
                                     <PaperPlaneIcon className="w-6 h-6 fill-current"/>
                                 </Button>
                             </div>
@@ -106,7 +108,7 @@ export function AiAssistantPageClient() {
                         <h3 className="text-xl font-semibold mb-4 text-center text-gray-300">Try asking:</h3>
                         <div className="grid grid-cols-1 gap-3">
                             {examplePrompts.map((p, i) => (
-                                 <div key={i} className="example-card p-4 rounded-lg cursor-pointer bg-white/5 backdrop-blur-sm border border-white/10" onClick={() => handleSendMessage(p)}>
+                                 <div key={i} className="example-card p-4 rounded-lg cursor-pointer bg-white/5 backdrop-blur-sm border border-white/10" onClick={() => handleSendMessage(p)} suppressHydrationWarning>
                                     <p className="text-lg">{p}</p>
                                 </div>
                             ))}

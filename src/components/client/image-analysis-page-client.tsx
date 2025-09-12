@@ -133,19 +133,17 @@ export function ImageAnalysisPageClient() {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <Card className="bg-card/50">
-        <CardHeader>
-          <CardTitle className="font-headline flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <ScanSearch />
-                Image Analysis
-            </div>
-            <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'upload' | 'webcam')}>
-                <TabsList>
-                    <TabsTrigger value="upload" suppressHydrationWarning><Upload className="mr-2 h-4 w-4"/> Upload</TabsTrigger>
-                    <TabsTrigger value="webcam" suppressHydrationWarning><Camera className="mr-2 h-4 w-4"/> Webcam</TabsTrigger>
-                </TabsList>
-            </Tabs>
+        <CardHeader className="gap-4">
+          <CardTitle className="font-headline flex items-center gap-2">
+            <ScanSearch />
+            Image Analysis
           </CardTitle>
+          <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'upload' | 'webcam')}>
+              <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="upload" suppressHydrationWarning><Upload className="mr-2 h-4 w-4"/> Upload</TabsTrigger>
+                  <TabsTrigger value="webcam" suppressHydrationWarning><Camera className="mr-2 h-4 w-4"/> Webcam</TabsTrigger>
+              </TabsList>
+          </Tabs>
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="space-y-2">

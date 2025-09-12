@@ -96,6 +96,7 @@ export function ThreeDVisualExplanationPageClient() {
               size="icon"
               disabled={isGenerating || !prompt.trim()}
               className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30"
+              suppressHydrationWarning
             >
               {isGenerating ? (
                 <Loader2 className="animate-spin" />

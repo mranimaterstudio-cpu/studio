@@ -8,6 +8,7 @@
 import { ai } from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const VisualExplanationSchema = z.object({
   title: z.string().describe('A clear and concise title for the explanation.'),
@@ -41,16 +42,24 @@ export async function generateVideoExplanation(
       throw new Error('Failed to generate textual explanation.');
     }
     
-    // Step 2: Generate the image using the prompt from Step 1
+    // Step 2: Return a placeholder image to avoid billing errors with Imagen.
+    // In a real scenario with billing enabled, you would generate the image like this:
+    /*
     const { media } = await ai.generate({
         model: 'googleai/imagen-4.0-fast-generate-001',
         prompt: explanationOutput.imagePrompt,
     });
+    */
+   
+    // Using a placeholder for now.
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+    const placeholder = PlaceHolderImages.find(p => p.id === 'image-generation-placeholder');
+    const imageUrl = placeholder ? placeholder.imageUrl : null;
 
 
     return { 
         explanation: explanationOutput,
-        imageUrl: media?.url ?? null
+        imageUrl: imageUrl
     };
 
   } catch (error) {

@@ -27,5 +27,5 @@ export async function chat(input: ChatInput) {
         output: { schema: ChatOutputSchema },
     });
 
-    return { content: output!.content };
+    return { content: output?.content ?? '' };
 }

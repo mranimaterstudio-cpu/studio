@@ -33,7 +33,7 @@ const PromptInput = React.forwardRef<
       className
     )}
     {...props}
-  />
+   suppressHydrationWarning/>
 ));
 PromptInput.displayName = 'PromptInput';
 

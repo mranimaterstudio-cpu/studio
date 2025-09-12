@@ -1,16 +1,15 @@
 'use client';
 import { useState } from 'react';
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Wand } from 'lucide-react';
+import { Loader2, Sparkles, Film } from 'lucide-react';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
-import { generateImage } from '@/ai/flows/generate-image';
+import { generateVideo } from '@/ai/flows/generate-video';
 
-export function ImageGenerationPageClient() {
+export function VideoGenerationPageClient() {
   const [prompt, setPrompt] = useState('');
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -18,22 +17,22 @@ export function ImageGenerationPageClient() {
     if (!prompt.trim()) {
       toast({
         title: 'Prompt is empty',
-        description: 'Please enter a prompt to generate an image.',
+        description: 'Please enter a prompt to generate a video.',
         variant: 'destructive',
       });
       return;
     }
     setIsGenerating(true);
-    setImageUrl(null);
+    setVideoUrl(null);
 
     try {
-      const generationResult = await generateImage(prompt);
-      if (generationResult.imageUrl) {
-        setImageUrl(generationResult.imageUrl);
+      const generationResult = await generateVideo(prompt);
+      if (generationResult.videoUrl) {
+        setVideoUrl(generationResult.videoUrl);
       } else {
         toast({
           title: 'Generation failed',
-          description: 'Could not generate an image. Please try again.',
+          description: 'Could not generate a video. Please try again.',
           variant: 'destructive',
         });
       }
@@ -60,7 +59,7 @@ export function ImageGenerationPageClient() {
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
-            <Wand /> Image Generation
+            <Film /> Video Generation
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -74,13 +73,13 @@ export function ImageGenerationPageClient() {
                   id="prompt-input"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g., A futuristic cityscape at sunset"
+                  placeholder="e.g., A majestic dragon soaring over a mystical forest"
                   disabled={isGenerating}
                   suppressHydrationWarning
                 />
               </PromptInputWrapper>
               <p className="text-xs text-muted-foreground">
-                Enter a prompt and the AI will generate an image for you.
+                Enter a prompt and the AI will generate a short video for you.
               </p>
             </div>
             <div className="flex gap-2 pt-4">
@@ -109,16 +108,16 @@ export function ImageGenerationPageClient() {
           {isGenerating ? (
             <div className="flex flex-col items-center gap-4 text-muted-foreground pt-16">
               <Loader2 className="w-16 h-16 animate-spin text-primary" />
-              <p>Generating your image...</p>
+              <p>Generating your video... this can take a minute.</p>
             </div>
-          ) : imageUrl ? (
-            <div className="relative aspect-square w-full rounded-md overflow-hidden border">
-              <Image src={imageUrl} alt={prompt} fill className="object-cover" />
+          ) : videoUrl ? (
+            <div className="relative aspect-video w-full rounded-md overflow-hidden border">
+              <video src={videoUrl} controls autoPlay loop className="w-full h-full object-cover" />
             </div>
           ) : (
             <div className="text-center text-muted-foreground pt-16">
-                <Wand className="mx-auto h-12 w-12 mb-4" />
-                <p>Your generated image will appear here.</p>
+                <Film className="mx-auto h-12 w-12 mb-4" />
+                <p>Your generated video will appear here.</p>
             </div>
           )}
         </CardContent>

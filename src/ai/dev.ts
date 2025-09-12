@@ -7,4 +7,4 @@ import '@/ai/flows/generate-visual-explanation.ts';
 import '@/ai/flows/assistant-chat.ts';
 import '@/ai/flows/generate-video-explanation.ts';
 import '@/ai/flows/extract-text-from-image.ts';
-import '@/ai/flows/generate-image.ts';
+import '@/ai/flows/generate-video.ts';

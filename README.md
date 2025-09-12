@@ -13,7 +13,15 @@ This is a Next.js application built with Firebase Studio that serves as a user-f
 
 ## Getting Started
 
-To get started, run the development server:
+First, configure your API keys. Copy the `.env.template` file to a new file named `.env` and add your API keys.
+
+```bash
+cp .env.template .env
+```
+
+Then, open the `.env` file and add your secret keys.
+
+Next, run the development server:
 
 ```bash
 npm run dev

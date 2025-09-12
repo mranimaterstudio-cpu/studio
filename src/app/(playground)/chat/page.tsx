@@ -98,7 +98,7 @@ export default function ChatPage() {
 
   return (
     <div className="h-[calc(100vh-10rem)] md:h-[calc(100vh-8rem)] flex flex-col gap-4">
-      <Card className="flex-1 flex flex-col">
+      <Card className="flex-1 flex flex-col bg-card/50">
         <CardHeader className="border-b">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-2xl font-bold font-headline">Chatbot</h2>
@@ -136,7 +136,7 @@ export default function ChatPage() {
                       <AvatarFallback><Bot className="w-5 h-5" /></AvatarFallback>
                     </Avatar>
                   )}
-                  <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/20 text-primary-foreground' : 'bg-secondary'}`}>
+                  <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   </div>
                   {message.role === 'user' && (

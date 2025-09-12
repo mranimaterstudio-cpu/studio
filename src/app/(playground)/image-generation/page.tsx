@@ -86,7 +86,7 @@ export default function ImageGenerationPage() {
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
-      <Card>
+      <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline">Image Generation</CardTitle>
         </CardHeader>
@@ -137,7 +137,7 @@ export default function ImageGenerationPage() {
         </CardFooter>
       </Card>
       
-      <Card>
+      <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline">Result</CardTitle>
         </CardHeader>

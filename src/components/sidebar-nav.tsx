@@ -6,12 +6,13 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { MessageSquare, ImageIcon, History, Bot } from 'lucide-react';
+import { MessageSquare, ImageIcon, History, ScanSearch } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [
   { href: '/chat', label: 'Chatbot', icon: MessageSquare },
   { href: '/image-generation', label: 'Image Generation', icon: ImageIcon },
+  { href: '/image-analysis', label: 'Image Analysis', icon: ScanSearch },
   { href: '/history', label: 'History', icon: History },
 ];
 

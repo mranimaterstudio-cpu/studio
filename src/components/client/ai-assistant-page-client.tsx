@@ -22,43 +22,6 @@ function PaperPlaneIcon(props: React.SVGProps<SVGSVGElement>) {
     )
 }
 
-function Particles() {
-    const [particles, setParticles] = useState<
-        {
-            id: number;
-            style: React.CSSProperties;
-        }[]
-    >([]);
-
-    useEffect(() => {
-        const newParticles = Array.from({ length: 20 }).map((_, i) => {
-            const size = Math.random() * 5 + 2;
-            const colors = ['#4FACFE', '#00F2FE', '#43e97b', '#38f9d7', '#fa709a', '#fee140'];
-            return {
-                id: i,
-                style: {
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-                    animationDelay: `${Math.random() * 4}s`,
-                },
-            };
-        });
-        setParticles(newParticles);
-    }, []);
-
-    return (
-        <div id="particles" className="absolute inset-0 -z-10 h-full w-full">
-            {particles.map((p) => (
-                <div key={p.id} className="particle" style={p.style} />
-            ))}
-        </div>
-    );
-}
-
-
 export function AiAssistantPageClient() {
     const [prompt, setPrompt] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
@@ -103,65 +66,36 @@ export function AiAssistantPageClient() {
         setIsLoading(false);
     };
 
-    const examplePrompts = [
-        'How to identify if the pashmina shawl I am buying is genuine?',
-        'Explain the concept of photosynthesis like I\'m five.',
-        'What are the key differences between Python and JavaScript?',
-    ];
-
     return (
-        <div className="relative flex flex-col h-[calc(100vh-8rem)] w-full overflow-hidden bg-transparent rounded-2xl">
-            <Particles />
-             <Card className="flex-1 flex flex-col bg-transparent border-0 z-10">
-                <CardHeader className="text-center">
-                     <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
-                    <p className="text-gray-400 text-xl">Ask anything, get intelligent responses</p>
-                </CardHeader>
-
+        <div className="relative flex flex-col h-[calc(100vh-8rem)] w-full overflow-hidden bg-background rounded-2xl bg-vignette">
+             <Card className="flex-1 flex flex-col bg-transparent border-0 z-20">
                 <CardContent className="p-0 flex-1 relative">
                     <ScrollArea className="h-full" ref={scrollAreaRef}>
                         <div className="p-6 space-y-6 max-w-3xl mx-auto">
-                            {messages.length === 0 && !isLoading && (
-                                <div className="text-center text-gray-300 pt-16">
-                                     <div className="mb-8">
-                                        <h3 className="text-xl font-semibold mb-4 text-center text-gray-300 flex items-center justify-center gap-2">
-                                            <Sparkles className="w-5 h-5 text-cyan-400"/>
-                                            Try asking
-                                        </h3>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {examplePrompts.map((p, i) => (
-                                                <div key={i} className="example-card p-4 rounded-lg cursor-pointer" onClick={() => setPrompt(p)}>
-                                                    <p className="text-lg text-gray-300">{p}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                             {messages.map((message) => (
                                 <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                                 {message.role === 'assistant' && (
-                                    <Avatar className="w-8 h-8 border-2 border-blue-400 shadow-lg shadow-blue-400/30">
-                                    <AvatarFallback className="bg-gray-800"><Bot className="w-5 h-5 text-blue-400" /></AvatarFallback>
+                                    <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
+                                    <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                                     </Avatar>
                                 )}
-                                <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-blue-500/80 text-white' : 'bg-white/5 backdrop-blur-sm border border-white/10'}`}>
+                                <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary/80'}`}>
                                     <p className="whitespace-pre-wrap">{message.content}</p>
                                 </div>
                                 {message.role === 'user' && (
-                                    <Avatar className="w-8 h-8 border-2 border-cyan-400 shadow-lg shadow-cyan-400/30">
-                                    <AvatarFallback className="bg-gray-800"><User className="w-5 h-5 text-cyan-400" /></AvatarFallback>
+                                    <Avatar className="w-8 h-8 border-2 border-accent shadow-lg shadow-accent/30">
+                                    <AvatarFallback className="bg-transparent"><User className="w-5 h-5 text-accent" /></AvatarFallback>
                                     </Avatar>
                                 )}
                                 </div>
                             ))}
                             {isLoading && (
                                 <div className="flex items-start gap-4">
-                                    <Avatar className="w-8 h-8 border-2 border-blue-400 shadow-lg shadow-blue-400/30">
-                                        <AvatarFallback className="bg-gray-800"><Bot className="w-5 h-5 text-blue-400" /></AvatarFallback>
+                                    <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
+                                        <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                                     </Avatar>
-                                    <div className="max-w-md p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 flex items-center">
-                                        <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
+                                    <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center">
+                                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
                                     </div>
                                 </div>
                             )}
@@ -171,36 +105,30 @@ export function AiAssistantPageClient() {
 
                 <CardFooter className="p-4 flex-col items-start gap-2 z-10">
                     <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
-                        <div className="gradient-border">
-                            <div className="input-container bg-background/80">
-                                <input
-                                    type="text"
-                                    placeholder="Ask anything..."
-                                    className="bg-transparent w-full outline-none text-xl px-6 py-4 text-white"
-                                    value={prompt}
-                                    onChange={(e) => setPrompt(e.target.value)}
-                                    disabled={isLoading}
+                        <PromptInputWrapper>
+                            <PromptInputAction>
+                                <Sparkles className="text-primary"/>
+                            </PromptInputAction>
+                            <PromptInput
+                                type="text"
+                                placeholder="Type your message..."
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                disabled={isLoading}
+                                suppressHydrationWarning
+                            />
+                            <PromptInputActions>
+                                <Button
+                                    type="submit"
+                                    size="icon"
+                                    className="w-9 h-9 rounded-full bg-primary cursor-pointer"
+                                    disabled={isLoading || !prompt.trim()}
                                     suppressHydrationWarning
-                                />
-                                <div className="flex space-x-1 sm:space-x-3 pr-2">
-                                    <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full text-blue-400 hover:bg-gray-800 transition" suppressHydrationWarning>
-                                        <Mic className="text-xl" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full text-green-400 hover:bg-gray-800 transition" suppressHydrationWarning>
-                                        <Camera className="text-xl" />
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        size="icon"
-                                        className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 cursor-pointer pulse-animation"
-                                        disabled={isLoading || !prompt.trim()}
-                                        suppressHydrationWarning
-                                    >
-                                        {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-gray-900 w-6 h-6 fill-current" />}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
+                                >
+                                    {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-primary-foreground w-4 h-4 fill-current" />}
+                                </Button>
+                            </PromptInputActions>
+                        </PromptInputWrapper>
                     </form>
                 </CardFooter>
             </Card>

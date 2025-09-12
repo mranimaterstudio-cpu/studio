@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
@@ -92,7 +93,7 @@ export function ImageAnalysisPageClient() {
         commonName: result.identification.commonName,
         latinName: result.identification.latinName,
         isHealthy: result.diagnosis.isHealthy,
-        diagnosis: result.diagnosis.diagnosis,
+        diagnosis: result.diagnosis,
       });
     } catch (error) {
       console.error(error);
@@ -249,3 +250,5 @@ export function ImageAnalysisPageClient() {
     </div>
   );
 }
+
+    

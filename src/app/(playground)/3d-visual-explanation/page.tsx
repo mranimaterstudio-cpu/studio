@@ -1,19 +1,16 @@
 'use client';
 import { useState } from 'react';
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Cuboid, Sparkles } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { PromptInput, PromptInputWrapper, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input';
-
-const placeholder = PlaceHolderImages.find(p => p.id === 'image-generation-placeholder')!;
+import { Loader2, Cuboid } from 'lucide-react';
+import { PromptInput, PromptInputWrapper, PromptInputActions } from '@/components/ui/prompt-input';
 
 export default function ThreeDVisualExplanationPage() {
   const [prompt, setPrompt] = useState('');
-  const [outputUrl, setOutputUrl] = useState<string>(placeholder.imageUrl);
+  const [outputUrl, setOutputUrl] = useState<string>('https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [videoKey, setVideoKey] = useState(Date.now());
   const { toast } = useToast();
 
   const handleGenerate = () => {
@@ -28,8 +25,10 @@ export default function ThreeDVisualExplanationPage() {
     setIsGenerating(true);
     // Mock generation
     setTimeout(() => {
-      const seed = encodeURIComponent(prompt.slice(0, 50));
-      setOutputUrl(`https://picsum.photos/seed/${seed}/512/512`);
+      // In a real app, you'd generate a video and get a new URL.
+      // For this mock, we'll just re-use a placeholder and update the key to force re-render.
+      setOutputUrl('https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+      setVideoKey(Date.now()); // Force the video element to re-load
       setIsGenerating(false);
     }, 2000);
   };
@@ -62,19 +61,21 @@ export default function ThreeDVisualExplanationPage() {
             <CardHeader>
                 <CardTitle className="font-headline">Result</CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center justify-center aspect-square relative">
+            <CardContent className="flex items-center justify-center aspect-video relative">
                 {isGenerating ? (
                     <div className="flex flex-col items-center gap-4 text-muted-foreground">
                         <Loader2 className="w-16 h-16 animate-spin text-primary" />
                         <p>Generating 3D visualization...</p>
                     </div>
                 ) : (
-                    <Image 
-                        src={outputUrl} 
-                        alt={prompt || placeholder.imageHint} 
-                        fill 
-                        className="object-cover rounded-md"
-                        data-ai-hint={placeholder.imageHint}
+                    <video
+                        key={videoKey}
+                        src={outputUrl}
+                        controls
+                        className="w-full h-full rounded-md object-cover"
+                        autoPlay
+                        muted
+                        loop
                     />
                 )}
             </CardContent>

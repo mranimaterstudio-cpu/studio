@@ -6,7 +6,7 @@ export type Message = {
   content: string;
 };
 
-export const PersonalitySchema = z.enum(['general', 'creative', 'technical', 'sarcastic']);
+export const PersonalitySchema = z.enum(['general', 'creative', 'technical', 'sarcastic', 'assistant']);
 export type Personality = z.infer<typeof PersonalitySchema>;
 
 

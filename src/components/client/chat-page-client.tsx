@@ -110,7 +110,7 @@ export function ChatPageClient() {
     <div className="h-[calc(100vh-10rem)] md:h-[calc(100vh-8rem)] flex flex-col gap-4">
       <Card className="flex-1 flex flex-col bg-card/50">
         <CardHeader className="border-b">
-          <div className="flex flex-wrap items-center justify-between gap-2" suppressHydrationWarning>
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-2xl font-bold font-headline">Chatbot</h2>
             <div className="flex items-center gap-2">
               <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)}>
@@ -122,6 +122,7 @@ export function ChatPageClient() {
                   <SelectItem value="creative">Creative</SelectItem>
                   <SelectItem value="technical">Technical</SelectItem>
                   <SelectItem value="sarcastic">Sarcastic</SelectItem>
+                  <SelectItem value="assistant">Assistant</SelectItem>
                 </SelectContent>
               </Select>
               <Button onClick={handleSaveExperiment} variant="outline" className="shadow-sm shadow-primary/20" suppressHydrationWarning>
@@ -175,7 +176,7 @@ export function ChatPageClient() {
               <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => handleSendMessage(s)}>{s}</Badge>
             ))}
           </div>
-          <div className="w-full flex items-center gap-2" suppressHydrationWarning>
+          <div className="w-full flex items-center gap-2">
              <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12" suppressHydrationWarning>
                 {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
               </Button>
@@ -186,6 +187,7 @@ export function ChatPageClient() {
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
                     disabled={isLoading}
+                    suppressHydrationWarning
                   />
                   <PromptInputActions>
                     <PromptInputAction disabled={isLoading} suppressHydrationWarning><Mic/></PromptInputAction>

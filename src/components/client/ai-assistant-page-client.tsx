@@ -27,11 +27,11 @@ export function AiAssistantPageClient() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
-    const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
-        if (scrollAreaRef.current) {
-          scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+        if (scrollAreaViewportRef.current) {
+          scrollAreaViewportRef.current.scrollTop = scrollAreaViewportRef.current.scrollHeight;
         }
       }, [messages]);
 
@@ -70,7 +70,7 @@ export function AiAssistantPageClient() {
         <div className="relative flex flex-col h-[calc(100vh-8rem)] w-full overflow-hidden bg-background rounded-2xl bg-vignette">
              <Card className="flex-1 flex flex-col bg-transparent border-0 z-20">
                 <CardContent className="p-0 flex-1 relative">
-                    <ScrollArea className="h-full" ref={scrollAreaRef}>
+                    <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                         <div className="p-6 space-y-6 max-w-3xl mx-auto">
                             {messages.map((message) => (
                                 <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>

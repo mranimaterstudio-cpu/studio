@@ -106,7 +106,7 @@ export function AiAssistantPageClient() {
                 <CardFooter className="p-4 flex-col items-start gap-2 z-10">
                     <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="w-full max-w-3xl mx-auto">
                         <PromptInputWrapper>
-                            <PromptInputAction>
+                            <PromptInputAction suppressHydrationWarning>
                                 <Sparkles className="text-primary"/>
                             </PromptInputAction>
                             <PromptInput

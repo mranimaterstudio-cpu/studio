@@ -1,3 +1,4 @@
+
 'use client';
 
 import { assistantChat } from '@/ai/flows/assistant-chat';
@@ -104,12 +105,13 @@ export function AiAssistantPageClient() {
                             onChange={(e) => setPrompt(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                             disabled={isLoading}
+                            suppressHydrationWarning
                         />
                         <div className="flex space-x-1 sm:space-x-3 pr-2">
-                            <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full text-blue-400 hover:bg-gray-800 transition">
+                            <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full text-blue-400 hover:bg-gray-800 transition" suppressHydrationWarning>
                                 <Mic className="text-xl" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full text-green-400 hover:bg-gray-800 transition">
+                            <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full text-green-400 hover:bg-gray-800 transition" suppressHydrationWarning>
                                 <Camera className="text-xl" />
                             </Button>
                             <Button
@@ -117,6 +119,7 @@ export function AiAssistantPageClient() {
                                 className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 cursor-pointer pulse-animation"
                                 onClick={handleGenerate}
                                 disabled={isLoading}
+                                suppressHydrationWarning
                             >
                                 {isLoading ? <Loader2 className="animate-spin" /> : <PaperPlaneIcon className="text-gray-900 w-6 h-6 fill-current" />}
                             </Button>

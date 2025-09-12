@@ -22,12 +22,14 @@ const personalitySystemPrompts: Record<Personality, string> = {
 export async function chat(input: ChatInput): Promise<ChatOutput> {
     const { history, personality } = input;
 
-    const { output } = await ai.generate({
+    const response = await ai.generate({
         model: googleAI.model('gemini-2.5-flash'),
         system: personalitySystemPrompts[personality],
         history: (history ?? []).map(msg => ({role: msg.role, parts: [{text: msg.content}]})),
         output: { schema: ChatOutputSchema },
     });
+
+    const output = response.output;
 
     return { content: output?.content ?? '' };
 }

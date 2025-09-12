@@ -7,6 +7,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/googleai';
 import type {ChatInput, ChatOutput} from '@/lib/types';
 import {ChatOutputSchema, Personality} from '@/lib/types';
 
@@ -21,7 +22,7 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
     const { history, personality } = input;
 
     const { output } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash',
+        model: googleAI.model('gemini-2.5-flash'),
         system: personalitySystemPrompts[personality],
         history: (history ?? []).map(msg => ({role: msg.role, parts: [{text: msg.content}]})),
         output: { schema: ChatOutputSchema },

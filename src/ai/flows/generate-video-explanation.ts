@@ -23,6 +23,7 @@ export async function generateVideoExplanation(
       config: {
         durationSeconds: 8,
         aspectRatio: '16:9',
+        responseEncoding: 'dataUri',
       },
     });
 
@@ -51,26 +52,7 @@ export async function generateVideoExplanation(
       return { videoUrl: null };
     }
     
-    // The media URL from Veo is temporary and needs the API key for access.
-    // It's better to return it as a data URI if possible, but for simplicity, we pass it.
-    // In a real app, you'd download this server-side and serve it from your own storage.
-    // Here we'll assume the client can access it for a short time.
-    // A robust solution would convert this to a base64 data URI.
-    
-    // For now, let's just return the URL, but it might not be directly usable in the client
-    // without special handling (like a proxy that adds the API key).
-    // A quick fix is to return a data uri if we can get the buffer, but the SDK doesn't expose that directly.
-    // Let's create a mock data URI for demonstration purposes, as fetching requires node-fetch.
-    
-    // A better approach would be to return the media as a data URI.
-    const response = await fetch(`${videoPart.media.url}&key=${process.env.GEMINI_API_KEY}`);
-    if (!response.ok) {
-        throw new Error(`Failed to download video: ${response.statusText}`);
-    }
-    const buffer = await response.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString('base64');
-
-    return { videoUrl: `data:${videoPart.media.contentType};base64,${base64}` };
+    return { videoUrl: videoPart.media.url };
 
   } catch (error) {
     console.error('Error generating video explanation:', error);

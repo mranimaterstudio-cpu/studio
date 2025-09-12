@@ -12,7 +12,7 @@ import Link from 'next/link';
 const navItems = [
   { href: '/ai-assistant', label: 'AI Assistant', icon: Bot },
   { href: '/video-generation', label: 'Video Generation', icon: Film },
-  { href: '/3d-visual-explanation', label: '3D Visual Explanation', icon: Cuboid },
+  { href: '/3d-visual-explanation', label: '3D Visual Experience', icon: Cuboid },
   { href: '/image-analysis', label: 'Image Analysis', icon: ScanSearch },
   { href: '/history', label: 'History', icon: History },
 ];

@@ -7,7 +7,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import type {ChatInput} from '@/lib/types';
+import type {ChatInput, ChatOutput} from '@/lib/types';
 import {ChatOutputSchema, Personality} from '@/lib/types';
 
 const personalitySystemPrompts: Record<Personality, string> = {
@@ -17,13 +17,13 @@ const personalitySystemPrompts: Record<Personality, string> = {
     sarcastic: "You are a sarcastic AI with a dry wit. While you are ultimately helpful, you deliver your knowledge with a cynical and humorous edge. Don't be afraid to be a little sassy.",
 };
 
-export async function chat(input: ChatInput) {
+export async function chat(input: ChatInput): Promise<ChatOutput> {
     const { history, personality } = input;
 
     const { output } = await ai.generate({
         model: 'googleai/gemini-2.5-flash',
         system: personalitySystemPrompts[personality],
-        history: history.map(msg => ({...msg, parts: [{text: msg.content}]})),
+        history: history.map(msg => ({role: msg.role, parts: [{text: msg.content}]})),
         output: { schema: ChatOutputSchema },
     });
 

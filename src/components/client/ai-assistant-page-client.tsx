@@ -75,43 +75,44 @@ export function AiAssistantPageClient() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full justify-center items-center">
-            {messages.length === 0 ? (
-                <div className="w-full max-w-3xl px-8 text-center">
-                    <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
-                    <p className="text-gray-400 text-xl mb-12">Ask anything, get intelligent responses</p>
-                    
-                    <div className="gradient-border mb-10">
-                        <div className="input-container bg-background/80 flex items-center p-2 rounded-full">
-                            <input 
-                                type="text" 
-                                placeholder="Ask anything..." 
-                                className="bg-transparent w-full outline-none text-xl px-6 py-4"
-                                value={prompt}
-                                onChange={(e) => setPrompt(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSendMessage();
-                                }}
-                                suppressHydrationWarning
-                            />
-                            <div className="flex space-x-1 pr-2">
-                                <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Mic className="text-blue-400"/></Button>
-                                <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Camera className="text-green-400"/></Button>
-                                <Button size="icon" className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 pulse-animation" onClick={() => handleSendMessage()} suppressHydrationWarning>
-                                    <PaperPlaneIcon className="w-6 h-6 fill-current"/>
-                                </Button>
+            messages.length === 0 ? (
+                <div className="flex flex-col h-full w-full justify-center items-center">
+                    <div className="w-full max-w-3xl px-8 text-center">
+                        <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
+                        <p className="text-gray-400 text-xl mb-12">Ask anything, get intelligent responses</p>
+                        
+                        <div className="gradient-border mb-10">
+                            <div className="input-container bg-[rgba(18,18,18,0.9)] flex items-center p-2 rounded-full">
+                                <input 
+                                    type="text" 
+                                    placeholder="Ask anything..." 
+                                    className="bg-transparent w-full outline-none text-xl px-6 py-4"
+                                    value={prompt}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSendMessage();
+                                    }}
+                                    suppressHydrationWarning
+                                />
+                                <div className="flex space-x-1 pr-2">
+                                    <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Mic className="text-blue-400"/></Button>
+                                    <Button variant="ghost" size="icon" className="w-12 h-12 rounded-full hover:bg-primary/10" suppressHydrationWarning><Camera className="text-green-400"/></Button>
+                                    <Button size="icon" className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 pulse-animation" onClick={() => handleSendMessage()} suppressHydrationWarning>
+                                        <PaperPlaneIcon className="w-6 h-6 fill-current"/>
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-xl font-semibold mb-4 text-center text-gray-300">Try asking:</h3>
-                        <div className="grid grid-cols-1 gap-3">
-                            {examplePrompts.map((p, i) => (
-                                 <div key={i} className="example-card p-4 rounded-lg cursor-pointer bg-white/5 backdrop-blur-sm border border-white/10" onClick={() => handleSendMessage(p)} suppressHydrationWarning>
-                                    <p className="text-lg">{p}</p>
-                                </div>
-                            ))}
+                        
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4 text-center text-gray-300">Try asking:</h3>
+                            <div className="grid grid-cols-1 gap-3">
+                                {examplePrompts.map((p, i) => (
+                                     <div key={i} className="example-card p-4 rounded-lg cursor-pointer bg-white/5 backdrop-blur-sm border border-white/10" onClick={() => handleSendMessage(p)} suppressHydrationWarning>
+                                        <p className="text-lg">{p}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,28 +122,28 @@ export function AiAssistantPageClient() {
                         <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                             <div className="p-6 space-y-6 max-w-3xl mx-auto">
                                 {messages.map((message) => (
-                                    <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                                    <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`} suppressHydrationWarning>
                                     {message.role === 'assistant' && (
-                                        <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
-                                        <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
+                                        <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30" suppressHydrationWarning>
+                                        <AvatarFallback className="bg-transparent" suppressHydrationWarning><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                                         </Avatar>
                                     )}
-                                    <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary/80'}`}>
+                                    <div className={`max-w-md p-3 rounded-lg ${message.role === 'user' ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary/80'}`} suppressHydrationWarning>
                                         <p className="whitespace-pre-wrap">{message.content}</p>
                                     </div>
                                     {message.role === 'user' && (
-                                        <Avatar className="w-8 h-8 border-2 border-accent shadow-lg shadow-accent/30">
-                                        <AvatarFallback className="bg-transparent"><User className="w-5 h-5 text-accent" /></AvatarFallback>
+                                        <Avatar className="w-8 h-8 border-2 border-accent shadow-lg shadow-accent/30" suppressHydrationWarning>
+                                        <AvatarFallback className="bg-transparent" suppressHydrationWarning><User className="w-5 h-5 text-accent" /></AvatarFallback>
                                         </Avatar>
                                     )}
                                     </div>
                                 ))}
                                 {isLoading && (
-                                    <div className="flex items-start gap-4">
-                                        <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30">
-                                            <AvatarFallback className="bg-transparent"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
+                                    <div className="flex items-start gap-4" suppressHydrationWarning>
+                                        <Avatar className="w-8 h-8 border-2 border-primary shadow-lg shadow-primary/30" suppressHydrationWarning>
+                                            <AvatarFallback className="bg-transparent" suppressHydrationWarning><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                                         </Avatar>
-                                        <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center">
+                                        <div className="max-w-md p-3 rounded-lg bg-secondary/80 flex items-center" suppressHydrationWarning>
                                             <Loader2 className="h-5 w-5 animate-spin text-primary" />
                                         </div>
                                     </div>
@@ -183,7 +184,6 @@ export function AiAssistantPageClient() {
                         </form>
                     </CardFooter>
                 </Card>
-            )}
-        </div>
+            )
     );
 }

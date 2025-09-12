@@ -99,7 +99,7 @@ export default function ImageGenerationPage() {
           <form onSubmit={handlePromptSubmit} className="space-y-4" suppressHydrationWarning>
              <div className="space-y-2">
                 <label htmlFor="prompt-input" className="font-medium">Prompt</label>
-                 <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2" suppressHydrationWarning>
                    <Button onClick={handleGenerateSuggestions} variant="ghost" size="icon" disabled={isSuggestionsLoading} className="h-12 w-12 flex-shrink-0">
                     {isSuggestionsLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="text-primary h-6 w-6" />}
                   </Button>

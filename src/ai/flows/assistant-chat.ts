@@ -21,7 +21,12 @@ Provide step-by-step explanations when necessary (especially useful for formulas
 
     const promptParts: any[] = [{text: prompt}];
     if (imageUrl) {
-        promptParts.unshift({media: {url: imageUrl}});
+        const match = imageUrl.match(/^data:(image\/[a-zA-Z]+);base64,/);
+        if (!match) {
+            throw new Error('Invalid image data URI');
+        }
+        const contentType = match[1];
+        promptParts.unshift({media: {url: imageUrl, contentType }});
     }
 
     const response = await ai.generate({

@@ -21,7 +21,7 @@ export async function chat(input: ChatInput) {
     const { history, personality } = input;
 
     const { output } = await ai.generate({
-        model: ai.registry.getModel('googleai/gemini-2.5-flash'),
+        model: 'googleai/gemini-2.5-flash',
         system: personalitySystemPrompts[personality],
         history: history.map(msg => ({ ...msg, parts: [{ text: msg.content }] })),
         output: { schema: ChatOutputSchema },

@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateId } from '@/lib/utils';
 import type { Message } from '@/lib/types';
-import { PromptInput, PromptInputWrapper, PromptInputActions } from '@/components/ui/prompt-input';
+import { PromptInput, PromptInputWrapper, PromptInputActions, PromptInputAction } from '@/components/ui/prompt-input';
 
 
 function PaperPlaneIcon(props: React.SVGProps<SVGSVGElement>) {

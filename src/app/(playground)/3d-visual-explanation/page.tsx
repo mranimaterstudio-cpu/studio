@@ -125,28 +125,6 @@ export default function ThreeDVisualExplanationPage() {
         <CardHeader>
           <CardTitle className="font-headline">Result</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center aspect-square relative">
-            {isGenerating ? (
-              <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                <Loader2 className="w-16 h-16 animate-spin text-primary" />
-                <p>Generating your masterpiece...</p>
-              </div>
-            ) : outputUrl ? (
-              <Image
-                src={outputUrl}
-                alt={prompt || "AI generated 3D visual"}
-                width={512}
-                height={512}
-                className="rounded-lg object-cover"
-                data-ai-hint={outputUrl === placeholder.imageUrl ? placeholder.imageHint : prompt.split(" ").slice(0, 2).join(" ")}
-              />
-            ) : (
-                <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                    <Cuboid className="w-16 h-16" />
-                    <p>Your generated 3D visual will appear here.</p>
-                </div>
-            )}
-        </CardContent>
       </Card>
     </div>
   );

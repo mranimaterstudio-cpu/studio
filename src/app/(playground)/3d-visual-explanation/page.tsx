@@ -17,7 +17,6 @@ const placeholder = PlaceHolderImages.find(p => p.id === 'image-generation-place
 
 export default function ThreeDVisualExplanationPage() {
   const [prompt, setPrompt] = useState('');
-  const [model, setModel] = useState<string>('model-1');
   const [outputUrl, setOutputUrl] = useState<string>(placeholder.imageUrl);
   const [isGenerating, setIsGenerating] = useState(false);
   const [experiments, setExperiments] = useLocalStorage<Experiment[]>('experiments', []);

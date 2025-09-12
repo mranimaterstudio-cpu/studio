@@ -6,7 +6,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Cuboid, History, ScanSearch, Wand, Bot, Clapperboard } from 'lucide-react';
+import { Cuboid, History, ScanSearch, Wand, Bot, Video } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [

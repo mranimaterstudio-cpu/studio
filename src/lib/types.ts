@@ -10,18 +10,6 @@ export const PersonalitySchema = z.enum(['general', 'creative', 'technical', 'sa
 export type Personality = z.infer<typeof PersonalitySchema>;
 
 
-export const ChatInputSchema = z.object({
-  history: z.array(
-    z.object({
-      role: z.enum(['user', 'assistant']),
-      content: z.string(),
-    })
-  ).optional(),
-  personality: PersonalitySchema,
-  prompt: z.string().optional(),
-});
-export type ChatInput = z.infer<typeof ChatInputSchema>;
-
 export const ChatOutputSchema = z.object({
   content: z.string(),
 });

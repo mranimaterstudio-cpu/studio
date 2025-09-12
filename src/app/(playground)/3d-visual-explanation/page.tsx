@@ -61,11 +61,6 @@ export default function ThreeDVisualExplanationPage() {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <Card>
-        <CardHeader>
-          <CardTitle className="font-headline flex items-center gap-2">
-            <Cuboid /> 3D Visual Explanation
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           <form
             onSubmit={handlePromptSubmit}

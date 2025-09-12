@@ -30,20 +30,21 @@ export function VideoGenerationPageClient() {
       if (result.videoUrl) {
         setVideoUrl(result.videoUrl);
       } else {
+        // This case should ideally not be hit if the flow always throws on error
         toast({
           title: 'Generation failed',
-          description: 'Could not generate a video. Please try again.',
+          description: 'Could not generate a video. The AI flow returned an empty response.',
           variant: 'destructive',
         });
       }
     } catch (error) {
-      toast({
-        title: 'Generation Failed',
-        description:
-          'An error occurred during generation. Please check the console for details.',
-        variant: 'destructive',
-      });
-      console.error(error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        toast({
+            title: 'Generation Failed',
+            description: errorMessage,
+            variant: 'destructive',
+        });
+        console.error(error);
     }
 
     setIsGenerating(false);

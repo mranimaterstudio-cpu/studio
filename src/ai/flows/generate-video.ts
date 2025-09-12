@@ -32,6 +32,10 @@ async function downloadVideoAsDataUrl(video: MediaPart): Promise<string> {
 export async function generateVideo(
     promptText: string
   ): Promise<{ videoUrl: string | null }> {
+    if (!process.env.GEMINI_API_KEY) {
+        throw new Error("The GEMINI_API_KEY environment variable is not set. Please add it to your .env file.");
+    }
+
     try {
       let { operation } = await ai.generate({
         model: googleAI.model('veo-2.0-generate-001'),
@@ -69,8 +73,11 @@ export async function generateVideo(
       };
 
     } catch (error) {
-      console.error('Error generating video:', error);
-      // Return a null url in case of error
-      return { videoUrl: null };
+      console.error('Error in generateVideo flow:', error);
+      // Re-throw the error to be caught by the client
+      if (error instanceof Error) {
+        throw new Error(`Video generation failed: ${error.message}`);
+      }
+      throw new Error('An unknown error occurred during video generation.');
     }
 }

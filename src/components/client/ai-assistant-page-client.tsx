@@ -1,4 +1,3 @@
-
 'use client';
 
 import { assistantChat } from '@/ai/flows/assistant-chat';

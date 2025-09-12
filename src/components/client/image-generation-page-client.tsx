@@ -5,11 +5,21 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles, Film } from 'lucide-react';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
-import { generateVideo } from '@/ai/flows/generate-video';
+import { generateVideoWithExplanation } from '@/ai/flows/generate-video-with-explanation';
+import { z } from 'zod';
+
+const VisualExplanationSchema = z.object({
+  title: z.string(),
+  explanation: z.string(),
+  imagePrompt: z.string(),
+});
+
+type VisualExplanation = z.infer<typeof VisualExplanationSchema>;
+
 
 export function VideoGenerationPageClient() {
   const [prompt, setPrompt] = useState('');
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [result, setResult] = useState<{explanation: VisualExplanation, videoUrl: string | null} | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -17,22 +27,22 @@ export function VideoGenerationPageClient() {
     if (!prompt.trim()) {
       toast({
         title: 'Prompt is empty',
-        description: 'Please enter a prompt to generate a video.',
+        description: 'Please enter a prompt to generate a video explanation.',
         variant: 'destructive',
       });
       return;
     }
     setIsGenerating(true);
-    setVideoUrl(null);
+    setResult(null);
 
     try {
-      const generationResult = await generateVideo(prompt);
-      if (generationResult.videoUrl) {
-        setVideoUrl(generationResult.videoUrl);
+      const generationResult = await generateVideoWithExplanation(prompt);
+      if (generationResult.explanation && generationResult.videoUrl) {
+        setResult(generationResult);
       } else {
         toast({
           title: 'Generation failed',
-          description: 'Could not generate a video. Please try again.',
+          description: 'Could not generate a video explanation. Please try again.',
           variant: 'destructive',
         });
       }
@@ -59,7 +69,7 @@ export function VideoGenerationPageClient() {
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
-            <Film /> Video Generation
+            <Film /> Video Explanation
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -79,7 +89,7 @@ export function VideoGenerationPageClient() {
                 />
               </PromptInputWrapper>
               <p className="text-xs text-muted-foreground">
-                Enter a prompt and the AI will generate a short video for you.
+                Enter a concept and the AI will generate an explanation with a video.
               </p>
             </div>
             <div className="flex gap-2 pt-4">
@@ -108,16 +118,24 @@ export function VideoGenerationPageClient() {
           {isGenerating ? (
             <div className="flex flex-col items-center gap-4 text-muted-foreground pt-16">
               <Loader2 className="w-16 h-16 animate-spin text-primary" />
-              <p>Generating your video... this can take a minute.</p>
+              <p>Generating... this can take a minute.</p>
             </div>
-          ) : videoUrl ? (
-            <div className="relative aspect-video w-full rounded-md overflow-hidden border">
-              <video src={videoUrl} controls autoPlay loop className="w-full h-full object-cover" />
+          ) : result ? (
+             <div className="space-y-4 w-full">
+                {result.videoUrl && (
+                    <div className="relative aspect-video w-full rounded-md overflow-hidden border">
+                        <video src={result.videoUrl} controls autoPlay loop className="w-full h-full object-cover" />
+                    </div>
+                )}
+                <div className='space-y-2'>
+                    <h3 className="text-xl font-bold">{result.explanation.title}</h3>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{result.explanation.explanation}</p>
+                </div>
             </div>
           ) : (
             <div className="text-center text-muted-foreground pt-16">
                 <Film className="mx-auto h-12 w-12 mb-4" />
-                <p>Your generated video will appear here.</p>
+                <p>Your generated video and explanation will appear here.</p>
             </div>
           )}
         </CardContent>

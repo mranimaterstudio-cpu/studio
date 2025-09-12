@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,9 @@ import { Loader2, Sparkles, Wand, Cuboid } from 'lucide-react';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
 import { find3dModel } from '@/ai/flows/find-3d-model';
 import Image from 'next/image';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { generateId } from '@/lib/utils';
+import { ImageExperiment, ImageModel } from '@/lib/types';
 
 
 export function ImageGenerationPageClient() {
@@ -14,6 +18,8 @@ export function ImageGenerationPageClient() {
   const [modelUid, setModelUid] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const [experiments, setExperiments] = useLocalStorage<ImageExperiment[]>('experiments', []);
+
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -31,6 +37,16 @@ export function ImageGenerationPageClient() {
       const result = await find3dModel(prompt);
       if (result.modelUid) {
         setModelUid(result.modelUid);
+        const newExperiment: ImageExperiment = {
+          id: generateId(),
+          type: 'image',
+          timestamp: Date.now(),
+          prompt: prompt,
+          model: 'dall-e-3', // Placeholder, as we are using sketchfab
+          imageUrl: `https://media.sketchfab.com/models/${result.modelUid}/thumbnails/thumbnail.jpeg`
+        };
+        setExperiments(prev => [...prev, newExperiment]);
+
       } else {
         toast({
           title: 'No models found',
@@ -90,6 +106,7 @@ export function ImageGenerationPageClient() {
                 type="submit"
                 disabled={isGenerating || !prompt.trim()}
                 className="flex-1 shadow-md shadow-primary/30"
+                suppressHydrationWarning
               >
                 {isGenerating ? (
                   <Loader2 className="animate-spin" />
@@ -134,3 +151,5 @@ export function ImageGenerationPageClient() {
     </div>
   );
 }
+
+    

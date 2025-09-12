@@ -10,11 +10,11 @@ import { useEffect, useState, useRef } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateId } from '@/lib/utils';
-import type { Message } from '@/lib/types';
+import type { Message, ChatExperiment, Personality } from '@/lib/types';
 import { PromptInput, PromptInputWrapper, PromptInputActions } from '@/components/ui/prompt-input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
-
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 function PaperPlaneIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -41,6 +41,7 @@ export function AiAssistantPageClient() {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [experiments, setExperiments] = useLocalStorage<ChatExperiment[]>('experiments', []);
 
     useEffect(() => {
         if (scrollAreaViewportRef.current) {
@@ -99,7 +100,19 @@ export function AiAssistantPageClient() {
                 role: 'assistant',
                 content: response.content,
             };
-            setMessages((prev) => [...prev, aiResponse]);
+            const finalMessages = [...newMessages, aiResponse];
+            setMessages(finalMessages);
+
+            // Save experiment
+            const newExperiment: ChatExperiment = {
+                id: generateId(),
+                type: 'chat',
+                timestamp: Date.now(),
+                personality: 'assistant' as Personality,
+                messages: finalMessages,
+            };
+            setExperiments([...experiments, newExperiment]);
+
         } catch (error) {
             console.error(error);
             toast({
@@ -299,3 +312,5 @@ export function AiAssistantPageClient() {
         </div>
     );
 }
+
+    

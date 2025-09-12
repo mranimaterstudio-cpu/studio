@@ -36,7 +36,7 @@ export default function PlaygroundLayout({
             <h1 className="text-xl font-semibold font-headline text-primary">AI Playground</h1>
           </Link>
         </header>
-        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 flex flex-col p-4 md:p-6 lg:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -75,7 +75,7 @@ export function AiAssistantPageClient() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-8rem)] w-full justify-center items-center">
+        <div className="flex flex-col h-full w-full justify-center items-center">
             {messages.length === 0 ? (
                 <div className="w-full max-w-3xl px-8 text-center">
                     <h1 className="text-5xl font-bold gradient-text mb-3">AI Lab</h1>
@@ -116,7 +116,7 @@ export function AiAssistantPageClient() {
                     </div>
                 </div>
             ) : (
-                <Card className="flex-1 flex flex-col w-full bg-card/50 rounded-2xl overflow-hidden">
+                <Card className="h-full flex flex-col w-full bg-card/50 rounded-2xl overflow-hidden">
                     <CardContent className="p-0 flex-1 relative">
                         <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                             <div className="p-6 space-y-6 max-w-3xl mx-auto">

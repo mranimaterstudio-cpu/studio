@@ -43,6 +43,15 @@ const generateVisualExplanationFlow = ai.defineFlow(
     outputSchema: z.object({videoUrl: z.string().nullable()}),
   },
   async prompt => {
+    // NOTE: The Veo model requires a Google Cloud project with billing enabled.
+    // To avoid errors, we are returning a mocked response.
+    // To use the actual video generation, enable billing on your project
+    // and uncomment the code below.
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return { videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' };
+
+    /*
     let {operation} = await ai.generate({
       model: googleAI.model('veo-2.0-generate-001'),
       prompt: `Create a short, clear, and concise visual explanation of the following concept: ${prompt}`,
@@ -75,5 +84,6 @@ const generateVisualExplanationFlow = ai.defineFlow(
 
     const dataUri = await convertVideoToBase64(video.media.url);
     return {videoUrl: dataUri};
+    */
   }
 );

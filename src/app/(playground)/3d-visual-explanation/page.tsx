@@ -1,6 +1,6 @@
 'use client';
 import {useState} from 'react';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {useToast} from '@/hooks/use-toast';
 import {Loader2, Cuboid} from 'lucide-react';
@@ -36,7 +36,8 @@ export default function ThreeDVisualExplanationPage() {
       } else {
         toast({
           title: 'No models found',
-          description: 'Could not find a matching 3D model. Please try a different search term.',
+          description:
+            'Could not find a matching 3D model. Please try a different search term.',
           variant: 'destructive',
         });
       }
@@ -61,10 +62,31 @@ export default function ThreeDVisualExplanationPage() {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <Card>
-        <CardContent>
+        <CardContent className="flex flex-col justify-between h-full">
+          <div className="flex items-center justify-center aspect-video relative">
+            {isGenerating ? (
+              <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                <Loader2 className="w-16 h-16 animate-spin text-primary" />
+                <p>Searching for 3D model...</p>
+              </div>
+            ) : modelUid ? (
+              <iframe
+                title="Sketchfab Viewer"
+                src={`https://sketchfab.com/models/${modelUid}/embed?autospin=1&autostart=1`}
+                allowFullScreen
+                allow="autoplay; fullscreen; xr-spatial-tracking"
+                className="w-full h-full rounded-md border-0"
+              ></iframe>
+            ) : (
+              <div className="text-center text-muted-foreground">
+                <Cuboid className="mx-auto h-12 w-12 mb-4" />
+                <p>Enter a prompt to search for a 3D model on Sketchfab.</p>
+              </div>
+            )}
+          </div>
           <form
             onSubmit={handlePromptSubmit}
-            className="w-full"
+            className="w-full mt-4"
             suppressHydrationWarning
           >
             <PromptInputWrapper>
@@ -94,9 +116,6 @@ export default function ThreeDVisualExplanationPage() {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Result</CardTitle>
-        </CardHeader>
         <CardContent className="flex items-center justify-center aspect-video relative">
           {isGenerating ? (
             <div className="flex flex-col items-center gap-4 text-muted-foreground">

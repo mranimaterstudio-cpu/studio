@@ -121,11 +121,6 @@ export default function ThreeDVisualExplanationPage() {
             </Button>
         </CardFooter>
       </Card>
-      <Card className="bg-card/50">
-        <CardHeader>
-          <CardTitle className="font-headline">Result</CardTitle>
-        </CardHeader>
-      </Card>
     </div>
   );
 }

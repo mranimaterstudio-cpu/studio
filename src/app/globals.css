@@ -66,3 +66,40 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(90deg, #4FACFE 0%, #00F2FE 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-border {
+      background: linear-gradient(90deg, #4FACFE 0%, #00F2FE 100%);
+      padding: 3px;
+      border-radius: 50px;
+      box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+  }
+
+  .pulse-animation {
+      animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(79, 172, 254, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
+  }
+
+  .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      animation: particle-animation 4s infinite;
+  }
+  @keyframes particle-animation {
+      0% { transform: translateY(0) scale(0); opacity: 0; }
+      20% { opacity: 0.7; }
+      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+  }
+}

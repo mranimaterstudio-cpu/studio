@@ -16,8 +16,9 @@ export const ChatInputSchema = z.object({
       role: z.enum(['user', 'assistant']),
       content: z.string(),
     })
-  ),
+  ).optional(),
   personality: PersonalitySchema,
+  prompt: z.string().optional(),
 });
 export type ChatInput = z.infer<typeof ChatInputSchema>;
 

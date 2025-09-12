@@ -8,7 +8,7 @@
 
 import {ai} from '@/ai/genkit';
 import {googleAI} from '@genkit-ai/googleai';
-import type {ChatInput, ChatOutput} from '@/lib/types';
+import type {ChatOutput} from '@/lib/types';
 import {ChatOutputSchema} from '@/lib/types';
 
 
@@ -23,7 +23,6 @@ Provide step-by-step explanations when necessary (especially useful for formulas
         model: googleAI.model('gemini-2.5-flash'),
         system: systemPrompt,
         prompt: prompt,
-        output: { schema: ChatOutputSchema },
     });
 
     const content = response.text;

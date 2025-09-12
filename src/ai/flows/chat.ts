@@ -29,7 +29,7 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
         output: { schema: ChatOutputSchema },
     });
 
-    const output = response.output;
+    const content = response.text;
 
-    return { content: output?.content ?? '' };
+    return { content };
 }

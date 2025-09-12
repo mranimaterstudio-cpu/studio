@@ -59,7 +59,7 @@ export function AiAssistantPageClient() {
             const aiResponse: Message = {
                 id: generateId(),
                 role: 'assistant',
-                content: response,
+                content: response.content,
             };
             setMessages((prev) => [...prev, aiResponse]);
         } catch (error) {

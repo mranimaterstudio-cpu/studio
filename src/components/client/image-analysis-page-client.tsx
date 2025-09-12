@@ -1,13 +1,15 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ScanSearch, Upload, X } from 'lucide-react';
+import { Loader2, ScanSearch, Upload, X, Camera, CircleDot, Video, VideoOff } from 'lucide-react';
 import { analyzeImage } from '@/ai/flows/analyze-image';
 import { Badge } from '@/components/ui/badge';
 import { PromptInput, PromptInputWrapper } from '@/components/ui/prompt-input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function ImageAnalysisPageClient() {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -15,8 +17,46 @@ export function ImageAnalysisPageClient() {
   const [description, setDescription] = useState('Analyze this image.');
   const [analysis, setAnalysis] = useState<{ isPlant: boolean, commonName: string, latinName: string, isHealthy: boolean, diagnosis: string } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [inputMode, setInputMode] = useState<'upload' | 'webcam'>('upload');
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (inputMode === 'webcam') {
+      const getCameraPermission = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          setHasCameraPermission(true);
+
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setHasCameraPermission(false);
+          toast({
+            variant: 'destructive',
+            title: 'Camera Access Denied',
+            description: 'Please enable camera permissions in your browser settings to use this app.',
+          });
+        }
+      };
+
+      getCameraPermission();
+      
+      // Cleanup function to stop video stream
+      return () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    }
+  }, [inputMode, toast]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,7 +75,7 @@ export function ImageAnalysisPageClient() {
     if (!imageUrl) {
       toast({
         title: 'No Image Selected',
-        description: 'Please upload an image to analyze.',
+        description: 'Please upload or capture an image to analyze.',
         variant: 'destructive',
       });
       return;
@@ -74,19 +114,41 @@ export function ImageAnalysisPageClient() {
     }
   }
 
+  const handleCapture = () => {
+    if (videoRef.current && canvasRef.current) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        if (context) {
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            const dataUrl = canvas.toDataURL('image/png');
+            setImageUrl(dataUrl);
+        }
+    }
+  }
+
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <Card className="bg-card/50">
         <CardHeader>
-          <CardTitle className="font-headline flex items-center gap-2">
-            <ScanSearch />
-            Image Analysis
+          <CardTitle className="font-headline flex items-center justify-between">
+            <div className="flex items-center gap-2">
+                <ScanSearch />
+                Image Analysis
+            </div>
+            <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'upload' | 'webcam')}>
+                <TabsList>
+                    <TabsTrigger value="upload"><Upload className="mr-2 h-4 w-4"/> Upload</TabsTrigger>
+                    <TabsTrigger value="webcam"><Camera className="mr-2 h-4 w-4"/> Webcam</TabsTrigger>
+                </TabsList>
+            </Tabs>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="space-y-2">
-                <label className="font-medium">Upload Image</label>
-                <div className="relative aspect-square w-full border-2 border-dashed rounded-lg flex items-center justify-center">
+                <div className="relative aspect-square w-full border-2 border-dashed rounded-lg flex items-center justify-center overflow-hidden">
                     {imageUrl ? (
                         <>
                             <Image src={imageUrl} alt="Uploaded for analysis" layout="fill" className="rounded-md object-contain" />
@@ -94,11 +156,32 @@ export function ImageAnalysisPageClient() {
                               <X/>
                             </Button>
                         </>
-                    ) : (
+                    ) : inputMode === 'upload' ? (
                        <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="h-auto p-8 flex flex-col gap-2">
                            <Upload className="h-12 w-12" />
                            <span className="font-semibold">Choose File</span>
                        </Button>
+                    ) : (
+                        <div className='w-full h-full flex flex-col items-center justify-center gap-4 bg-secondary'>
+                            {hasCameraPermission === null && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
+                            {hasCameraPermission === false && (
+                                <Alert variant="destructive">
+                                    <VideoOff className="h-4 w-4"/>
+                                    <AlertTitle>Camera Access Denied</AlertTitle>
+                                    <AlertDescription>
+                                        Please enable camera permissions in your browser settings.
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+                            {hasCameraPermission && (
+                                <>
+                                    <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                                    <Button onClick={handleCapture} className="absolute bottom-4 z-10 shadow-lg shadow-primary/40 rounded-full" size="lg">
+                                        <CircleDot className="mr-2"/> Capture
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     )}
                      <input
                         type="file"
@@ -107,6 +190,7 @@ export function ImageAnalysisPageClient() {
                         className="hidden"
                         accept="image/*"
                     />
+                    <canvas ref={canvasRef} className="hidden" />
                 </div>
             </div>
              <div className="space-y-2">

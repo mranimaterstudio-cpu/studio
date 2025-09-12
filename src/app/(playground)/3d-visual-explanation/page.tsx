@@ -88,7 +88,6 @@ export default function ThreeDVisualExplanationPage() {
             onChange={e => setPrompt(e.target.value)}
             placeholder="Enter a concept to visualize..."
             disabled={isGenerating}
-            suppressHydrationWarning
           />
           <PromptInputActions>
             <Button

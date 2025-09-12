@@ -75,7 +75,7 @@ export default function ImageAnalysisPage() {
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-8" suppressHydrationWarning>
+    <div className="grid md:grid-cols-2 gap-8">
       <Card className="bg-card/50">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2">
@@ -90,12 +90,12 @@ export default function ImageAnalysisPage() {
                     {imageUrl ? (
                         <>
                             <Image src={imageUrl} alt="Uploaded for analysis" layout="fill" className="rounded-md object-contain" />
-                            <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={handleRemoveImage} suppressHydrationWarning>
+                            <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={handleRemoveImage}>
                               <X/>
                             </Button>
                         </>
                     ) : (
-                       <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="h-auto p-8 flex flex-col gap-2" suppressHydrationWarning>
+                       <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="h-auto p-8 flex flex-col gap-2">
                            <Upload className="h-12 w-12" />
                            <span className="font-semibold">Choose File</span>
                        </Button>
@@ -116,13 +116,12 @@ export default function ImageAnalysisPage() {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="What do you want to know about the image?"
-                        suppressHydrationWarning
                     />
                  </PromptInputWrapper>
              </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAnalyze} disabled={isAnalyzing || !imageUrl} className="w-full" suppressHydrationWarning>
+          <Button onClick={handleAnalyze} disabled={isAnalyzing || !imageUrl} className="w-full">
             {isAnalyzing ? <Loader2 className="mr-2 animate-spin" /> : <ScanSearch className="mr-2" />}
             Analyze Image
           </Button>

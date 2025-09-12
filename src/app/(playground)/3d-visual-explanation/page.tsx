@@ -84,8 +84,6 @@ export default function ThreeDVisualExplanationPage() {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <Card className="bg-card/50">
-        <CardHeader>
-        </CardHeader>
         <CardFooter className="flex gap-2" suppressHydrationWarning>
             <Button onClick={handleGenerate} disabled={isGenerating} className="flex-1 shadow-md shadow-primary/30">
                 {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}

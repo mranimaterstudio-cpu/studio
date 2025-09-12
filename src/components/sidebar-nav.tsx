@@ -29,6 +29,7 @@ export function SidebarNav() {
             isActive={pathname === item.href}
             tooltip={item.label}
             className="data-[active=true]:shadow-[0_0_15px_hsl(var(--primary)/0.5)]"
+            suppressHydrationWarning
           >
             <Link href={item.href}>
               <item.icon />

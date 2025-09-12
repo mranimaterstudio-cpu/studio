@@ -136,7 +136,7 @@ export function AiAssistantPageClient() {
       }
 
     return (
-        <div className="h-full flex flex-col w-full bg-transparent">
+        <div className="h-full flex flex-col w-full bg-transparent" suppressHydrationWarning>
         {messages.length === 0 ? (
             <div className="flex flex-col h-full w-full justify-center items-center">
                 <div className="w-full max-w-3xl px-8 text-center">
